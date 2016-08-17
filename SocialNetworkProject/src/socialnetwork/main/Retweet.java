@@ -1,10 +1,10 @@
 package socialnetwork.main;
 
-import exceptions.InvalidArgumentException;
+import exceptions.InvalidInputException;
 
 public class Retweet extends Post {
 
-	public Retweet(String text, User poster) throws InvalidArgumentException {
+	public Retweet(String text, User poster) throws InvalidInputException {
 		super(text, poster);
 		
 	}

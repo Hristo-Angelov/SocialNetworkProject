@@ -2,7 +2,7 @@ package socialnetwork.main;
 
 import java.util.*;
 
-import exceptions.InvalidArgumentException;
+import exceptions.InvalidInputException;
 
 public class DataBase {
 	
@@ -22,11 +22,11 @@ public class DataBase {
 		//ToDo
 	}
 	
-	public void addUser(User user) throws InvalidArgumentException{
+	public void addUser(User user) throws InvalidInputException{
 		if(user != null){
 			users.add(user);
 		}else{
-			throw new InvalidArgumentException("Not valid User");
+			throw new InvalidInputException("Not valid User");
 		}
 	}
 	

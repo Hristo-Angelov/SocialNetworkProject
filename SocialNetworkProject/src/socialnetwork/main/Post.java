@@ -3,7 +3,8 @@ package socialnetwork.main;
 import java.time.LocalDate;
 import java.util.*;
 
-import exceptions.InvalidArgumentException;
+import exceptions.InvalidInputException;
+import exceptions.Validator;
 
 public class Post {
 	private String text;
@@ -16,13 +17,13 @@ public class Post {
 	
 	
 	
-	public Post(String text, User poster) throws InvalidArgumentException {
+	public Post(String text, User poster) throws InvalidInputException {
 		
-		this.text = User.validateText(text);
+		this.text = Validator.validateString(text);
 		if(poster != null){
 			this.poster = poster;
 		}else{
-			throw new InvalidArgumentException("Not valid poster");
+			throw new InvalidInputException("Not valid poster");
 		}
 		this.dateWhenPosted = dateWhenPosted.now();
 		
