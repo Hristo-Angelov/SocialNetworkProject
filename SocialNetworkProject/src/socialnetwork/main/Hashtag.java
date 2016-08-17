@@ -7,8 +7,9 @@ public class Hashtag {
 	private int count = 0;
 
 	public Hashtag(String name) throws InvalidInputException {
-		super();
-		this.name = Validator.validateString(name);
+		if (Validator.isValidString(name)) {
+			this.name = name;
+		}
 
 	}
 
