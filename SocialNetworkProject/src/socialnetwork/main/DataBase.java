@@ -57,18 +57,27 @@ public class DataBase {
 		throw new InvalidInputException("Not existing user!");
 	}
 
+	/**
+	 * Loops through all hashtags stored in this post and and adds each one to
+	 * the database if it is not already on there, in which case it increases
+	 * the hashtag's count. Then the post is added to the list of posts
+	 * containing the specific hashtag.
+	 * 
+	 * @param post
+	 *            Post whose hashtags are to be stored in the database
+	 */
 	public void addHashtags(Post post) {
 		for (Hashtag hashtag : post.getHashtags()) {
 			if (this.hashtags.containsKey(hashtag)) {
-				for (Hashtag tag: this.hashtags.keySet()) {
+				for (Hashtag tag : this.hashtags.keySet()) {
 					if (tag.equals(hashtag)) {
 						tag.increaseHashtagCount();
 					}
 				}
 			} else {
 				this.hashtags.put(hashtag, new ArrayList<Post>());
-				this.hashtags.get(hashtag).add(post);
 			}
+			this.hashtags.get(hashtag).add(post);
 		}
 	}
 

@@ -10,7 +10,7 @@ public class Hashtag {
 	public static final Pattern HASHTAG_REGEX = Pattern.compile("(?<!\\w)#(\\w+)");
 	
 	private String name;
-	private int count = 0;
+	private int count;
 	private boolean isTrending;
 	private LocalDate dateWhenCreated = LocalDate.now();
 
@@ -18,6 +18,7 @@ public class Hashtag {
 		if (Validator.isValidString(name)) {
 			this.name = name;
 		}
+		this.count = 1;
 
 	}
 
