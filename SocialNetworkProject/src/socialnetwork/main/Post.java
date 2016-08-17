@@ -15,9 +15,8 @@ public class Post {
 	private String text;
 	private User poster;
 	private LocalDate dateWhenPosted;
-	private Post question;
 	private List<Post> answers = new ArrayList<Post>();
-	private List<Post> likes = new ArrayList<Post>();
+	private List<User> likes = new ArrayList<User>();
 	private Set<Hashtag> hashtags = new HashSet<Hashtag>();
 
 	public Post(String text, User poster) throws InvalidInputException {
@@ -36,18 +35,37 @@ public class Post {
 		return this.text;
 	}
 
-	public void setQuestion(Post originalPost) {
-		// TODO Auto-generated method stub
+	public void deleteLike(Post post) throws InvalidInputException {
+		if (Validator.isValidObject(post)) {
+			if (likes.contains(post)) {
+				likes.remove(post);
+			} else {
+				throw new InvalidInputException("Not an existing like!");
+			}
+		}
 
 	}
 
-	public void delete() {
-		// TODO Auto-generated method stub
+	public void addAnswer(Post post) throws InvalidInputException {
+		if (Validator.isValidObject(post)) {
+			answers.add(post);
+		} else {
+			throw new InvalidInputException("Invalid post! ");
+		}
+	}
+
+	public void deleteAnswer(Post post) throws InvalidInputException {
+		if (Validator.isValidObject(post)) {
+			if (answers.contains(post)) {
+				answers.remove(post);
+			} else {
+				throw new InvalidInputException("Not an existing answer!");
+			}
+		}
 
 	}
 
 	public void addReply(Post myRetweet) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -57,7 +75,6 @@ public class Post {
 	}
 
 	public void retweet(Post originalPost) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -69,16 +86,21 @@ public class Post {
 		return dateWhenPosted;
 	}
 
-	public Post getQuestion() {
-		return question;
-	}
-
 	public List<Post> getAnswers() {
 		return answers;
 	}
 
-	public List<Post> getLikes() {
+	public List<User> getLikes() {
 		return likes;
+	}
+
+	public void delete() {
+
+	}
+
+	public void addLike(User user) {
+		likes.add(user);
+
 	}
 
 }

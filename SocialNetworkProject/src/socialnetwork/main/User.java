@@ -85,6 +85,7 @@ public class User implements IUser {
 		try {
 			if (Validator.isValidObject(post)) {
 				this.likedPosts.add(post);
+				post.addLike(this);
 			}
 		} catch (InvalidInputException e) {
 			throw new InvalidInputException("Error! Can't like a non-existant post.");
