@@ -39,4 +39,11 @@ public class Validator {
 		}
 		return true;
 	}
+
+	public static boolean isValidObject(Object obj) throws InvalidInputException {
+		if (obj == null) {
+			throw new InvalidInputException("Error! Object is null.");
+		}
+		return true;
+	}
 }

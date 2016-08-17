@@ -1,13 +1,14 @@
 package interfaces;
 
+import exceptions.InvalidInputException;
 import socialnetwork.main.Post;
 import socialnetwork.main.User;
 
 public interface IUser {
 	
-	void approveUser(User user);
-	void post(Post post);
-	void deletePost(Post post);
-	void reply(Post post);
-	void retweet(Post post);
+	public void approveFollower(User follower) throws InvalidInputException;
+	void addPost(Post post) throws InvalidInputException;
+	void deletePost(Post post) throws InvalidInputException;
+	void reply(Post originalPost, Post myReply);
+	void retweet(Post originalPost, Post myReply);
 }

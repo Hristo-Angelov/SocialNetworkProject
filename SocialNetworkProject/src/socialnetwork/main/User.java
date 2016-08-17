@@ -2,31 +2,37 @@ package socialnetwork.main;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import exceptions.InvalidInputException;
+import interfaces.IUser;
 
-public class User {
-	
+public class User implements IUser {
+
+	// password dimensions
 	private static final int MIN_PASSWORD_LENGTH = 8;
 	private static final int MAX_PASS_WORD_LENGTH = 32;
-	// private constants
+	// username dimenstions
 	private static final int MIN_USERNAME_LENGTH = 2;
 	private static final int MAX_USERNAME_LENGTH = 20;
-	
-	// private fields
+
+	// required fields
 	private String username;
 	private String password;
 	private String email;
-	private File picture;
 	private final LocalDate joinDate;
-	private List<Post> likedPosts = new ArrayList<Post>();
-	private List<Post> myPosts = new ArrayList<Post>();
+	
+	// changeable user inforamtion 
+	private File picture;
 	private boolean isPrivate;
 	
+	// automatically tracked user data
+	private final List<Post> likedPosts = new ArrayList<Post>();
+	private final List<Post> myPosts = new ArrayList<Post>();
+
 	private final Set<User> followers = new LinkedHashSet<User>();
-	private final Set<User> followed = new LinkedHashSet<User>();
+	private final Set<User> followedUsers = new LinkedHashSet<User>();
+	private final List<User> followRequests = new ArrayList<User>();
 
 	public User(String username, String password, String email) throws InvalidInputException {
 		if (Validator.isValidString(username, MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH)) {
@@ -41,13 +47,14 @@ public class User {
 		this.joinDate = LocalDate.now();
 	}
 
-//	public void LogIn(String username, String password) {
-//		
-//	}
-//	
+	// public void LogIn(String username, String password) {
+	//
+	// }
+	//
 
 	public void changePassword(String newPassword) throws InvalidInputException {
-		if (Validator.isValidString(newPassword, MIN_PASSWORD_LENGTH, MAX_PASS_WORD_LENGTH) && (!this.password.equals(newPassword))) {
+		if (Validator.isValidString(newPassword, MIN_PASSWORD_LENGTH, MAX_PASS_WORD_LENGTH)
+				&& (!this.password.equals(newPassword))) {
 			this.password = newPassword;
 		}
 	}
@@ -74,23 +81,55 @@ public class User {
 		return likedPosts;
 	}
 
-	public void setLikedPosts(List<Post> likedPosts) {
-		this.likedPosts = likedPosts;
+	public void likePost(Post post) throws InvalidInputException {
+		try {
+			if (Validator.isValidObject(post)) {
+				this.likedPosts.add(post);
+			}
+		} catch (InvalidInputException e) {
+			throw new InvalidInputException("Error! Can't like a non-existant post.");
+		}
 	}
 
 	public List<Post> getMyPosts() {
 		return myPosts;
 	}
 
-	public void setMyPosts(List<Post> myPosts) {
-		this.myPosts = myPosts;
+	public void addPost(Post post) throws InvalidInputException {
+		try {
+			if (Validator.isValidObject(post)) {
+				this.myPosts.add(post);
+			}
+		} catch (InvalidInputException e) {
+			throw new InvalidInputException("Error! Can't post a non-existant post.");
+		}
 	}
 
 	public boolean isPrivate() {
 		return isPrivate;
 	}
 
+	/**
+	 * Sets profile to "private" if passed the argument "true", so unapproved
+	 * users cannot see this user's posts. While user's profile is set to
+	 * private, all followers need explicit permission to see user's posts. If
+	 * passed the argument "false", user's profile is set to "public" and all
+	 * their posts are freely visible and any previous follow requests are
+	 * approved.
+	 * 
+	 * @param isPrivate
+	 *            Value of user's privacy settings
+	 */
 	public void setPrivate(boolean isPrivate) {
+		if (!isPrivate) {
+			for (User user : followRequests) {
+				try {
+					this.approveFollower(user);
+				} catch (InvalidInputException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 		this.isPrivate = isPrivate;
 	}
 
@@ -106,12 +145,100 @@ public class User {
 		return followers;
 	}
 
-	public Set<User> getFollowed() {
-		return followed;
+	public Set<User> getFollowedUsers() {
+		return followedUsers;
 	}
 
-	
-	
+	/**
+	 * Allows follower to see this user's private posts.
+	 * 
+	 * @param follower
+	 *            User being given permission to see this user's private posts.
+	 * @throws InvalidInputException
+	 *             If follower does not exist.
+	 */
+	public void approveFollower(User follower) throws InvalidInputException {
+		this.setFollowerPermission(follower, true);
+	}
 
+	/**
+	 * Denies follower from seeing this user's private posts.
+	 * 
+	 * @param follower
+	 *            User being denied permission to see this user's private posts.
+	 * @throws InvalidInputException
+	 *             If follower does not exist.
+	 */
+	public void rejectFollower(User follower) throws InvalidInputException {
+		this.setFollowerPermission(follower, false);
+	}
+
+	private void setFollowerPermission(User follower, boolean permission) throws InvalidInputException {
+		try {
+			if (Validator.isValidObject(follower)) {
+				follower.follow(this, permission);
+				this.followRequests.remove(follower);
+			}
+		} catch (InvalidInputException e) {
+			throw new InvalidInputException("Error! No such user.", e);
+		}
+	}
+
+	private void follow(User follower, boolean permission) {
+		follower.followedUsers.add(this);
+		this.followers.add(follower);
+	}
+
+	/**
+	 * Send a follow request to a user. If their profile is set to "private" a
+	 * request will be sent, otherwise the request is implicitly granted.
+	 * 
+	 * @param user
+	 *            User to be followed pending approval.
+	 */
+	public void sendFollowRequest(User user) {
+		if (user.isPrivate) {
+			user.followRequests.add(this);
+		} else {
+			this.follow(user, true);
+		}
+	}
+
+	/**
+	 * Unfollows a previously followed user.
+	 * 
+	 * @param followed
+	 *            User to be unfollowed.
+	 */
+	public void unfollow(User followed) {
+		followed.followers.remove(this);
+		this.followedUsers.remove(followed);
+	}
+
+	@Override
+	public void deletePost(Post post) throws InvalidInputException {
+		try {
+			if (Validator.isValidObject(post)) {
+				this.myPosts.remove(post);
+			}
+		} catch (InvalidInputException e) {
+			throw new InvalidInputException("This post no longer exists." , e);
+		}
+	}
+
+	@Override
+	public void reply(Post originalPost, Post myReply) {
+		myReply.setQuestion(originalPost);
+		originalPost.addReply(myReply);
+		addPost(myReply);
+	}
+
+	@Override
+	public void retweet(Post originalPost, Post myRetweet) {
+		myRetweet.setQuestion(originalPost);
+		originalPost.addReply(myRetweet);
+		addPost(myRetweet);
+	}
+	
 
 }
