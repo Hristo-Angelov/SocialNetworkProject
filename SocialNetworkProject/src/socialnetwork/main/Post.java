@@ -1,7 +1,8 @@
 package socialnetwork.main;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Matcher;
 
 import exceptions.InvalidInputException;
 
@@ -14,7 +15,7 @@ public class Post {
 	// private fields
 	private String text;
 	private User poster;
-	private LocalDate dateWhenPosted;
+	private LocalDateTime dateWhenPosted;
 	private List<Post> answers = new ArrayList<Post>();
 	private List<User> likes = new ArrayList<User>();
 	private Set<Hashtag> hashtags = new HashSet<Hashtag>();
@@ -27,8 +28,9 @@ public class Post {
 		} else {
 			throw new InvalidInputException("Not valid poster");
 		}
-		this.dateWhenPosted = dateWhenPosted.now();
-
+		this.dateWhenPosted = LocalDateTime.now();
+		this.findHashtags(text);
+//		database.addHashtags(this);
 	}
 
 	public String getText() {
@@ -82,7 +84,7 @@ public class Post {
 		return poster;
 	}
 
-	public LocalDate getDateWhenPosted() {
+	public LocalDateTime getDateWhenPosted() {
 		return dateWhenPosted;
 	}
 
@@ -100,7 +102,17 @@ public class Post {
 
 	public void addLike(User user) {
 		likes.add(user);
+	}
+	
+	private void findHashtags(String text) throws InvalidInputException {
+		Matcher matcher = Hashtag.HASHTAG_REGEX.matcher(text);
+		while (matcher.find()) {
+			hashtags.add(new Hashtag(matcher.group(0)));
+		}
+	}
 
+	public Set<Hashtag> getHashtags() {
+		return Collections.unmodifiableSet(this.hashtags);
 	}
 
 }

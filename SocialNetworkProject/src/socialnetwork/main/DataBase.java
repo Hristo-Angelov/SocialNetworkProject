@@ -7,18 +7,17 @@ import exceptions.InvalidInputException;
 
 public class DataBase {
 
-	private Map<Hashtag, ArrayList<Post>> hashTags = new HashMap<Hashtag, ArrayList<Post>>();
+	private Map<Hashtag, ArrayList<Post>> hashtags = new HashMap<Hashtag, ArrayList<Post>>();
 	private Set<User> users = new HashSet<User>();
 
-	
 	public void addHashtagPost(Hashtag hashtag, Post post) throws InvalidInputException {
 		if (Validator.isValidObject(hashtag) && Validator.isValidObject(post)) {
 			hashtag.increaseHashtagCount();
-			if (hashTags.containsKey(hashtag)) {
-				hashTags.get(hashtag).add(post);
+			if (hashtags.containsKey(hashtag)) {
+				hashtags.get(hashtag).add(post);
 			} else {
-				hashTags.put(hashtag, new ArrayList<Post>());
-				hashTags.get(hashtag).add(post);
+				hashtags.put(hashtag, new ArrayList<Post>());
+				hashtags.get(hashtag).add(post);
 
 			}
 		} else {
@@ -26,23 +25,21 @@ public class DataBase {
 		}
 	}
 
-	
-	
 	public void validateHashTags() {
-		for (Entry<Hashtag, ArrayList<Post>> key : hashTags.entrySet()) {
-			
+		for (Entry<Hashtag, ArrayList<Post>> key : hashtags.entrySet()) {
+
 			if (key.getValue().isEmpty()) {
-				hashTags.remove(key.getKey(), key.getValue());
+				hashtags.remove(key.getKey());
 			}
 		}
 	}
 
 	public ArrayList<Post> getPosts(String hashTag) {
-		return (ArrayList<Post>) Collections.unmodifiableList(hashTags.get(hashTag));
+		return (ArrayList<Post>) Collections.unmodifiableList(hashtags.get(hashTag));
 	}
 
 	public void updatePublicPosts() {
-
+		// TODO
 	}
 
 	public void addUser(User user) throws InvalidInputException {
@@ -58,6 +55,21 @@ public class DataBase {
 			return user;
 		}
 		throw new InvalidInputException("Not existing user!");
+	}
+
+	public void addHashtags(Post post) {
+		for (Hashtag hashtag : post.getHashtags()) {
+			if (this.hashtags.containsKey(hashtag)) {
+				for (Hashtag tag: this.hashtags.keySet()) {
+					if (tag.equals(hashtag)) {
+						tag.increaseHashtagCount();
+					}
+				}
+			} else {
+				this.hashtags.put(hashtag, new ArrayList<Post>());
+				this.hashtags.get(hashtag).add(post);
+			}
+		}
 	}
 
 }
