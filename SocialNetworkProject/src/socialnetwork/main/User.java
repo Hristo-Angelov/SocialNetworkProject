@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.*;
 
 import exceptions.InvalidInputException;
-import exceptions.Validator;
 
 public class User {
 	private static final int MIN_USERNAME_LENGTH = 4;

@@ -1,4 +1,6 @@
-package exceptions;
+package socialnetwork.main;
+
+import exceptions.InvalidInputException;
 
 public class Validator {
 

@@ -1,6 +1,6 @@
 package socialnetwork.main;
 
-import exceptions.InvalidInputException;
+import exceptions.*;
 
 public class Hashtag {
 	private String name;
@@ -8,7 +8,7 @@ public class Hashtag {
 
 	public Hashtag(String name) throws InvalidInputException {
 		super();
-		this.name = User.validateText(name);
+		this.name = Validator.validateString(name);
 
 	}
 

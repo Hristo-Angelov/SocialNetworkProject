@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.*;
 
 import exceptions.InvalidInputException;
-import exceptions.Validator;
 
 public class Post {
 	private String text;
