@@ -34,8 +34,33 @@ public class Post {
 		
 	}
 	
-	public void printPost(){
-		//TO print sth.
+	public String getText(){
+		return this.text;
+	}
+
+	public void setQuestion(Post originalPost) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void delete() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void addReply(Post myRetweet) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void reply(Post originalPost) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void retweet(Post originalPost) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	

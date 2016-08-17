@@ -13,7 +13,7 @@ public class Hashtag {
 
 	}
 
-	public void increaseNumberOfHashtags() {
+	public void increaseHashtagCount() {
 		this.count++;
 	}
 

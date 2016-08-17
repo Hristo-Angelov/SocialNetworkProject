@@ -21,11 +21,11 @@ public class User implements IUser {
 	private String password;
 	private String email;
 	private final LocalDate joinDate;
-	
-	// changeable user inforamtion 
+
+	// changeable user inforamtion
 	private File picture;
 	private boolean isPrivate;
-	
+
 	// automatically tracked user data
 	private final List<Post> likedPosts = new ArrayList<Post>();
 	private final List<Post> myPosts = new ArrayList<Post>();
@@ -219,26 +219,38 @@ public class User implements IUser {
 	public void deletePost(Post post) throws InvalidInputException {
 		try {
 			if (Validator.isValidObject(post)) {
-				this.myPosts.remove(post);
+				if (this.myPosts.remove(post)) {
+					post.delete();
+				}
 			}
 		} catch (InvalidInputException e) {
-			throw new InvalidInputException("This post no longer exists." , e);
+			throw new InvalidInputException("This post no longer exists.", e);
 		}
 	}
 
 	@Override
-	public void reply(Post originalPost, Post myReply) {
-		myReply.setQuestion(originalPost);
-		originalPost.addReply(myReply);
+	public void reply(Post originalPost, Post myReply) throws InvalidInputException {
+		try {
+			if (Validator.isValidObject(originalPost)) {
+				myReply.reply(originalPost);
+			}
+		} catch (Exception e) {
+			throw new InvalidInputException("Cannot retweet a non-existent post.", e);
+		}
 		addPost(myReply);
 	}
 
 	@Override
-	public void retweet(Post originalPost, Post myRetweet) {
-		myRetweet.setQuestion(originalPost);
-		originalPost.addReply(myRetweet);
+	public void retweet(Post originalPost, Post myRetweet) throws InvalidInputException {
+		try {
+			if (Validator.isValidObject(originalPost)) {
+				myRetweet.retweet(originalPost);
+			}
+		} catch (Exception e) {
+			throw new InvalidInputException("Cannot retweet a non-existent post.", e);
+		}
 		addPost(myRetweet);
+
 	}
-	
 
 }
