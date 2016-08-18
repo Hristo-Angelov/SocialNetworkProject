@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import exceptions.InvalidInputException;
+import socialnetwork.main.Post.Hashtag;
 
 public class DataBase {
 

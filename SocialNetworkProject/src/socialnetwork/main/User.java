@@ -21,6 +21,7 @@ public class User implements IUser {
 	private String password;
 	private String email;
 	private final LocalDate joinDate;
+	private DataBase database;
 
 	// changeable user inforamtion
 	private File picture;
@@ -47,6 +48,12 @@ public class User implements IUser {
 		this.joinDate = LocalDate.now();
 	}
 
+	public User(String username, String password, String email, DataBase database) throws InvalidInputException {
+		this(username, password, email);
+		if (Validator.isValidObject(database)) {
+			this.database = database;
+		}
+	}
 	// public void LogIn(String username, String password) {
 	// TODO
 	// }
@@ -252,6 +259,10 @@ public class User implements IUser {
 		}
 		addPost(myRetweet);
 
+	}
+
+	public DataBase getDatabase() {
+		return this.database;
 	}
 
 }
