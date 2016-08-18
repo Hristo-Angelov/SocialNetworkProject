@@ -1,0 +1,57 @@
+package socialnetwork.main;
+
+import exceptions.InvalidInputException;
+
+public class Demo {
+
+	public static void main(String[] args) {
+		// 1. Database
+		DataBase database = new DataBase();
+		try {
+			// 2. Users
+			User jim = new User("Jim", "strongPassword", "qwe@gmail.com", database);
+			User john = new User("John", "streongerPassword", "asd@gmail.com", database);
+			User james = new User("James", "streongestPassword", "zxc@gmail.com", database);
+			
+			// 3. Follow/Unfollow
+			System.out.println(james + " follows " + jim);
+			james.sendFollowRequest(jim);
+			System.out.println(jim + " Followers: " + jim.getFollowers().size());
+			System.out.println(james + " Following: " + james.getFollowedUsers().size());
+			System.out.println(james + " unfollows " + jim);
+			james.unfollow(jim);
+			System.out.println(jim + " Followers: " + jim.getFollowers().size());
+			System.out.println(james + " Following: " + james.getFollowedUsers().size());
+			
+			System.out.println("John goes private.");
+			john.setPrivate(true);
+			System.out.println("Jim requests to follow John.");
+			jim.sendFollowRequest(john);
+			System.out.println(jim + " Followers: " + jim.getFollowers().size());
+			System.out.println(john + " Following: " + john.getFollowedUsers().size());
+			System.out.println("John approves Jim.");
+			john.approveFollower(jim);
+			System.out.println(jim + " Followers: " + jim.getFollowers().size());
+			System.out.println(john + " Following: " + john.getFollowedUsers().size());
+			
+			// 4. Posts
+			Post jimPost1 = new Post("First tweet! #firstTweet2016 #greatConsoleDemo #greatConsoleDemo", jim);
+			jim.addPost(jimPost1);
+			john.likePost(jimPost1);
+			james.likePost(jimPost1);
+			Post jamesPost1 = new Post("@Jim Congrats! #greatPost", james);
+			james.reply(jimPost1, jamesPost1);
+			System.out.println(jim.getMyPosts().get(0));
+			System.out.println(jamesPost1);
+			
+			
+			// 5. Trending hashtags
+			System.out.println("\nTrending Hashtags:");
+			System.out.println(database.getTrendingHashtags());
+			
+			
+		} catch (InvalidInputException e) {
+			e.printStackTrace();
+		}
+	}
+}

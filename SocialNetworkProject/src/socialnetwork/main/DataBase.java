@@ -8,23 +8,24 @@ import socialnetwork.main.Post.Hashtag;
 
 public class DataBase {
 
+	private static final int MAX_NUMBER_OF_TRENDING_HASHTAGS = 10;
 	private Map<Hashtag, ArrayList<Post>> hashtags = new HashMap<Hashtag, ArrayList<Post>>();
 	private Set<User> users = new HashSet<User>();
 
-	public void addHashtagPost(Hashtag hashtag, Post post) throws InvalidInputException {
-		if (Validator.isValidObject(hashtag) && Validator.isValidObject(post)) {
-			hashtag.increaseHashtagCount();
-			if (hashtags.containsKey(hashtag)) {
-				hashtags.get(hashtag).add(post);
-			} else {
-				hashtags.put(hashtag, new ArrayList<Post>());
-				hashtags.get(hashtag).add(post);
-
-			}
-		} else {
-			throw new InvalidInputException("Not valid post or hashtag!");
-		}
-	}
+//	public void addHashtagPost(Hashtag hashtag, Post post) throws InvalidInputException {
+//		if (Validator.isValidObject(hashtag) && Validator.isValidObject(post)) {
+//			hashtag.increaseHashtagCount();
+//			if (hashtags.containsKey(hashtag)) {
+//				hashtags.get(hashtag).add(post);
+//			} else {
+//				hashtags.put(hashtag, new ArrayList<Post>());
+//				hashtags.get(hashtag).add(post);
+//
+//			}
+//		} else {
+//			throw new InvalidInputException("Not valid post or hashtag!");
+//		}
+//	}
 
 	public void validateHashTags() {
 		for (Entry<Hashtag, ArrayList<Post>> key : hashtags.entrySet()) {
@@ -80,6 +81,20 @@ public class DataBase {
 			}
 			this.hashtags.get(hashtag).add(post);
 		}
+	}
+
+	public String getTrendingHashtags() {
+		StringBuilder sb = new StringBuilder();
+		List<Hashtag> sortedHashtags = new ArrayList<Hashtag>(this.hashtags.keySet());
+		sortedHashtags.sort((tag1, tag2) -> tag2.getCount() - tag1.getCount());
+		int topTags = 1;
+		for (Hashtag hashtag : sortedHashtags) {
+			sb.append(hashtag.getName() + " - " + hashtag.getCount() + "\n");
+			if (topTags++ >= MAX_NUMBER_OF_TRENDING_HASHTAGS) {
+				break;
+			}
+		}
+		return sb.toString();
 	}
 
 }

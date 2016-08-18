@@ -2,6 +2,7 @@ package socialnetwork.main;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,9 +20,11 @@ public class Post {
 	private String text;
 	private User poster;
 	private LocalDateTime dateWhenPosted;
-	private List<Post> answers = new ArrayList<Post>();
+	private Post originalPost;
 	private List<User> likes = new ArrayList<User>();
-	private Set<Hashtag> hashtags = new HashSet<Hashtag>();
+	private List<Post> replies = new ArrayList<Post>();
+	private List<Post> retweets = new ArrayList<Post>();
+	private List<Hashtag> hashtags = new ArrayList<Hashtag>();
 
 	public Post(String text, User poster) throws InvalidInputException {
 		if (Validator.isValidString(text, MIN_POST_LENGTH, MAX_POST_LENGTH))
@@ -36,7 +39,7 @@ public class Post {
 		this.poster.getDatabase().addHashtags(this);
 	}
 	
-	public class Hashtag {
+	public class Hashtag implements Comparable<Hashtag> {
 		
 		private String name;
 		private int count;
@@ -54,6 +57,51 @@ public class Post {
 			this.count++;
 		}
 
+		@Override
+		public int compareTo(Hashtag other) {
+			return this.count - other.count;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public int getCount() {
+			return count;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result + ((name == null) ? 0 : name.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Hashtag other = (Hashtag) obj;
+			if (!getOuterType().equals(other.getOuterType()))
+				return false;
+			if (name == null) {
+				if (other.name != null)
+					return false;
+			} else if (!name.equals(other.name))
+				return false;
+			return true;
+		}
+
+		private Post getOuterType() {
+			return Post.this;
+		}
+		
 	}
 
 	public String getText() {
@@ -73,16 +121,16 @@ public class Post {
 
 	public void addAnswer(Post post) throws InvalidInputException {
 		if (Validator.isValidObject(post)) {
-			answers.add(post);
+			replies.add(post);
 		} else {
-			throw new InvalidInputException("Invalid post! ");
+			throw new InvalidInputException("Invalid post!");
 		}
 	}
 
 	public void deleteAnswer(Post post) throws InvalidInputException {
 		if (Validator.isValidObject(post)) {
-			if (answers.contains(post)) {
-				answers.remove(post);
+			if (replies.contains(post)) {
+				replies.remove(post);
 			} else {
 				throw new InvalidInputException("Not an existing answer!");
 			}
@@ -94,9 +142,9 @@ public class Post {
 		// TODO
 	}
 
-	public void reply(Post originalPost) {
-		// TODO Auto-generated method stub
-
+	public void reply(Post originalPost) throws InvalidInputException {
+		this.originalPost = originalPost;
+		originalPost.addAnswer(this);
 	}
 
 	public void retweet(Post originalPost) {
@@ -112,7 +160,7 @@ public class Post {
 	}
 
 	public List<Post> getAnswers() {
-		return answers;
+		return replies;
 	}
 
 	public List<User> getLikes() {
@@ -134,8 +182,15 @@ public class Post {
 		}
 	}
 
-	public Set<Hashtag> getHashtags() {
-		return Collections.unmodifiableSet(this.hashtags);
+	public List<Hashtag> getHashtags() {
+		return Collections.unmodifiableList(this.hashtags);
+	}
+	
+	@Override
+	public String toString() {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+		return "User: " + this.poster + "; Posted on: " + this.dateWhenPosted.format(formatter) + ": " + this.text + "\nLikes: "
+				+ this.likes.size() + "\tReplies: " + this.replies.size() + "\tRetweets: " + this.retweets.size();
 	}
 
 }

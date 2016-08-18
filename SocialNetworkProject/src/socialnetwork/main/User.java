@@ -31,8 +31,8 @@ public class User implements IUser {
 	private final List<Post> likedPosts = new ArrayList<Post>();
 	private final List<Post> myPosts = new ArrayList<Post>();
 
-	private final Set<User> followers = new LinkedHashSet<User>();
-	private final Set<User> followedUsers = new LinkedHashSet<User>();
+	private final List<User> followers = new ArrayList<User>();
+	private final Set<User> followedUsers = new HashSet<User>();
 	private final List<User> followRequests = new ArrayList<User>();
 
 	public User(String username, String password, String email) throws InvalidInputException {
@@ -149,12 +149,28 @@ public class User implements IUser {
 		return joinDate;
 	}
 
-	public Set<User> getFollowers() {
+	public List<User> getFollowers() {
 		return followers;
 	}
 
 	public Set<User> getFollowedUsers() {
 		return followedUsers;
+	}
+
+	/**
+	 * Send a follow request to a user. If their profile is set to "private" a
+	 * request will be sent, otherwise the request is implicitly granted.
+	 * 
+	 * @param user
+	 *            User to be followed pending approval.
+	 * @throws InvalidInputException 
+	 */
+	public void sendFollowRequest(User user) throws InvalidInputException {
+		if (user.isPrivate) {
+			user.followRequests.add(this);
+		} else {
+			this.setFollowerPermission(user, true);
+		}
 	}
 
 	/**
@@ -184,7 +200,9 @@ public class User implements IUser {
 	private void setFollowerPermission(User follower, boolean permission) throws InvalidInputException {
 		try {
 			if (Validator.isValidObject(follower)) {
-				follower.follow(this, permission);
+				if (permission) {
+					follower.follow(this);
+				}
 				this.followRequests.remove(follower);
 			}
 		} catch (InvalidInputException e) {
@@ -192,24 +210,9 @@ public class User implements IUser {
 		}
 	}
 
-	private void follow(User follower, boolean permission) {
+	private void follow(User follower) {
 		follower.followedUsers.add(this);
 		this.followers.add(follower);
-	}
-
-	/**
-	 * Send a follow request to a user. If their profile is set to "private" a
-	 * request will be sent, otherwise the request is implicitly granted.
-	 * 
-	 * @param user
-	 *            User to be followed pending approval.
-	 */
-	public void sendFollowRequest(User user) {
-		if (user.isPrivate) {
-			user.followRequests.add(this);
-		} else {
-			this.follow(user, true);
-		}
 	}
 
 	/**
@@ -265,4 +268,8 @@ public class User implements IUser {
 		return this.database;
 	}
 
+	@Override
+	public String toString() {
+		return this.username;
+	}
 }
