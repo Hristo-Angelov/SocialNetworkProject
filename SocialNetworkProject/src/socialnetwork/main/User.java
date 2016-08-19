@@ -231,6 +231,7 @@ public class User implements IUser {
 		try {
 			if (Validator.isValidObject(post)) {
 				if (this.myPosts.remove(post)) {
+
 					post.delete();
 				}
 			}

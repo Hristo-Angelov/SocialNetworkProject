@@ -21,12 +21,13 @@ public class Post {
 	private User poster;
 	private LocalDateTime dateWhenPosted;
 	private Post originalPost;
+	private DataBase database;
 	private List<User> likes = new ArrayList<User>();
 	private List<Post> replies = new ArrayList<Post>();
 	private List<Post> retweets = new ArrayList<Post>();
 	private List<Hashtag> hashtags = new ArrayList<Hashtag>();
 
-	public Post(String text, User poster) throws InvalidInputException {
+	public Post(String text, User poster , DataBase database) throws InvalidInputException {
 		if (Validator.isValidString(text, MIN_POST_LENGTH, MAX_POST_LENGTH))
 			this.text = text;
 		if (poster != null) {
@@ -34,13 +35,19 @@ public class Post {
 		} else {
 			throw new InvalidInputException("Not valid poster");
 		}
+		if(Validator.isValidObject(database)){
+			this.database = database;
+			
+		}else{
+			throw new InvalidInputException("Invalid database");
+		}
 		this.dateWhenPosted = LocalDateTime.now();
 		this.findHashtags(text);
 		this.poster.getDatabase().addHashtags(this);
 	}
-	
+
 	public class Hashtag implements Comparable<Hashtag> {
-		
+
 		private String name;
 		private int count;
 		private LocalDate dateWhenCreated = LocalDate.now();
@@ -55,6 +62,14 @@ public class Post {
 
 		public void increaseHashtagCount() {
 			this.count++;
+		}
+		
+		public void decreaseHashtagCount() throws InvalidInputException{
+			if(this.count >0){
+			this.count--;
+			}else{
+				Post.this.database.deleteHashTag(this);
+			}
 		}
 
 		@Override
@@ -101,7 +116,7 @@ public class Post {
 		private Post getOuterType() {
 			return Post.this;
 		}
-		
+
 	}
 
 	public String getText() {
@@ -138,17 +153,47 @@ public class Post {
 
 	}
 
+	public void printPeopleWhoLikedThisPost() {
+		if (likes.size() > 0) {
+			for (User user : likes) {
+				System.out.println(user);
+			}
+		} else {
+			System.out.println("No likes yet!");
+		}
+	}
+
+	public void printAllReplies() {
+		if (replies.size() > 0) {
+			for (Post post : replies) {
+				System.out.println(post);
+			}
+		}else{
+			System.out.println("No replies yet");
+		}
+	}
+	
 	public void addReply(Post myRetweet) {
 		// TODO
 	}
 
 	public void reply(Post originalPost) throws InvalidInputException {
 		this.originalPost = originalPost;
-		originalPost.addAnswer(this);
+		originalPost.addReply(this);
 	}
 
-	public void retweet(Post originalPost) {
-		// TODO
+	public void retweet(Post originalPost) throws InvalidInputException {
+		if(Validator.isValidObject(originalPost)){
+			Retweet newRetweet = new Retweet(this.text, this.poster, originalPost, database);
+			originalPost.addRetweet(newRetweet);
+		}
+	}
+	
+	
+	public void addRetweet(Retweet retweet) throws InvalidInputException{
+		if(Validator.isValidObject(retweet)){
+			retweets.add(retweet);
+		}
 	}
 
 	public User getPoster() {
@@ -167,30 +212,42 @@ public class Post {
 		return likes;
 	}
 
-	public void delete() {
-		// TODO
-	}
+	
 
 	public void addLike(User user) {
 		likes.add(user);
 	}
-	
+
 	private void findHashtags(String text) throws InvalidInputException {
 		Matcher matcher = Post.HASHTAG_REGEX.matcher(text);
 		while (matcher.find()) {
 			hashtags.add(new Hashtag(matcher.group(0)));
 		}
+		database.addHashtags(this);
+		
 	}
 
 	public List<Hashtag> getHashtags() {
 		return Collections.unmodifiableList(this.hashtags);
 	}
-	
+
 	@Override
 	public String toString() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-		return "User: " + this.poster + "; Posted on: " + this.dateWhenPosted.format(formatter) + ": " + this.text + "\nLikes: "
-				+ this.likes.size() + "\tReplies: " + this.replies.size() + "\tRetweets: " + this.retweets.size();
+		return "User: " + this.poster + "; Posted on: " + this.dateWhenPosted.format(formatter) + ": " + this.text
+				+ "\nLikes: " + this.likes.size() + "\tReplies: " + this.replies.size() + "\tRetweets: "
+				+ this.retweets.size();
+	}
+
+	public void delete() throws InvalidInputException {
+		if(hashtags.size()>0){
+			for (Hashtag hashtag : hashtags) {
+				hashtag.decreaseHashtagCount();
+			}
+		}else{
+			System.out.println("No hashtags in this post.");
+		}
+		
 	}
 
 }

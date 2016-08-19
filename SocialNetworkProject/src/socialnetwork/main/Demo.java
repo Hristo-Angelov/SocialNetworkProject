@@ -35,11 +35,11 @@ public class Demo {
 			System.out.println(john + " Following: " + john.getFollowedUsers().size());
 			
 			// 4. Posts
-			Post jimPost1 = new Post("First tweet! #firstTweet2016 #greatConsoleDemo #greatConsoleDemo", jim);
+			Post jimPost1 = new Post("First tweet! #firstTweet2016 #greatConsoleDemo #greatConsoleDemo", jim, database);
 			jim.addPost(jimPost1);
 			john.likePost(jimPost1);
 			james.likePost(jimPost1);
-			Post jamesPost1 = new Post("@Jim Congrats! #greatPost", james);
+			Post jamesPost1 = new Post("@Jim Congrats! #greatPost", james, database);
 			james.reply(jimPost1, jamesPost1);
 			System.out.println(jim.getMyPosts().get(0));
 			System.out.println(jamesPost1);

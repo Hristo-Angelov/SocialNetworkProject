@@ -2,6 +2,7 @@ package socialnetwork.main;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
 
 import exceptions.InvalidInputException;
 import socialnetwork.main.Post.Hashtag;
@@ -12,20 +13,21 @@ public class DataBase {
 	private Map<Hashtag, ArrayList<Post>> hashtags = new HashMap<Hashtag, ArrayList<Post>>();
 	private Set<User> users = new HashSet<User>();
 
-//	public void addHashtagPost(Hashtag hashtag, Post post) throws InvalidInputException {
-//		if (Validator.isValidObject(hashtag) && Validator.isValidObject(post)) {
-//			hashtag.increaseHashtagCount();
-//			if (hashtags.containsKey(hashtag)) {
-//				hashtags.get(hashtag).add(post);
-//			} else {
-//				hashtags.put(hashtag, new ArrayList<Post>());
-//				hashtags.get(hashtag).add(post);
-//
-//			}
-//		} else {
-//			throw new InvalidInputException("Not valid post or hashtag!");
-//		}
-//	}
+	// public void addHashtagPost(Hashtag hashtag, Post post) throws
+	// InvalidInputException {
+	// if (Validator.isValidObject(hashtag) && Validator.isValidObject(post)) {
+	// hashtag.increaseHashtagCount();
+	// if (hashtags.containsKey(hashtag)) {
+	// hashtags.get(hashtag).add(post);
+	// } else {
+	// hashtags.put(hashtag, new ArrayList<Post>());
+	// hashtags.get(hashtag).add(post);
+	//
+	// }
+	// } else {
+	// throw new InvalidInputException("Not valid post or hashtag!");
+	// }
+	// }
 
 	public void validateHashTags() {
 		for (Entry<Hashtag, ArrayList<Post>> key : hashtags.entrySet()) {
@@ -95,6 +97,17 @@ public class DataBase {
 			}
 		}
 		return sb.toString();
+	}
+
+	public void deleteHashTag(Hashtag hashtag) throws InvalidInputException {
+		if(Validator.isValidObject(hashtag)){
+			if(hashtags.containsKey(hashtag)){
+				hashtags.remove(hashtag);
+			}
+		}else{
+			throw new InvalidInputException("Not valid hashtag!");
+		}
+		
 	}
 
 }
