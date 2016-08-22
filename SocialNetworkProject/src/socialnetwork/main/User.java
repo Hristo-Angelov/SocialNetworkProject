@@ -256,12 +256,12 @@ public class User implements IUser {
 	public void retweet(Post originalPost, Post myRetweet) throws InvalidInputException {
 		try {
 			if (Validator.isValidObject(originalPost)) {
-				myRetweet.retweet(originalPost);
+				addPost(myRetweet.retweet(originalPost));
 			}
 		} catch (Exception e) {
 			throw new InvalidInputException("Cannot retweet a non-existent post.", e);
 		}
-		addPost(myRetweet);
+//		addPost(myRetweet);
 
 	}
 

@@ -43,7 +43,6 @@ public class Post {
 		}
 		this.dateWhenPosted = LocalDateTime.now();
 		this.findHashtags(text);
-		this.poster.getDatabase().addHashtags(this);
 	}
 
 	public class Hashtag implements Comparable<Hashtag> {
@@ -65,7 +64,7 @@ public class Post {
 		}
 		
 		public void decreaseHashtagCount() throws InvalidInputException{
-			if(this.count >0){
+			if(this.count >1){
 			this.count--;
 			}else{
 				Post.this.database.deleteHashTag(this);
@@ -182,11 +181,13 @@ public class Post {
 		originalPost.addReply(this);
 	}
 
-	public void retweet(Post originalPost) throws InvalidInputException {
+	public Retweet retweet(Post originalPost) throws InvalidInputException {
 		if(Validator.isValidObject(originalPost)){
 			Retweet newRetweet = new Retweet(this.text, this.poster, originalPost, database);
 			originalPost.addRetweet(newRetweet);
+			return newRetweet;
 		}
+		return null;
 	}
 	
 	

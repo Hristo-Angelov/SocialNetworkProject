@@ -18,10 +18,13 @@ public class Demo {
 			james.sendFollowRequest(jim);
 			System.out.println(jim + " Followers: " + jim.getFollowers().size());
 			System.out.println(james + " Following: " + james.getFollowedUsers().size());
+			
+			System.out.println();
 			System.out.println(james + " unfollows " + jim);
 			james.unfollow(jim);
 			System.out.println(jim + " Followers: " + jim.getFollowers().size());
 			System.out.println(james + " Following: " + james.getFollowedUsers().size());
+			System.out.println();
 			
 			System.out.println("John goes private.");
 			john.setPrivate(true);
@@ -29,10 +32,13 @@ public class Demo {
 			jim.sendFollowRequest(john);
 			System.out.println(jim + " Followers: " + jim.getFollowers().size());
 			System.out.println(john + " Following: " + john.getFollowedUsers().size());
+			
+			System.out.println();
 			System.out.println("John approves Jim.");
 			john.approveFollower(jim);
 			System.out.println(jim + " Followers: " + jim.getFollowers().size());
 			System.out.println(john + " Following: " + john.getFollowedUsers().size());
+			System.out.println();
 			
 			// 4. Posts
 			Post jimPost1 = new Post("First tweet! #firstTweet2016 #greatConsoleDemo #greatConsoleDemo", jim, database);
@@ -49,6 +55,10 @@ public class Demo {
 			System.out.println("\nTrending Hashtags:");
 			System.out.println(database.getTrendingHashtags());
 			
+			// 6. Removing posts
+			jim.deletePost(jimPost1);
+			System.out.println("Trending Hashtags:");
+			System.out.println(database.getTrendingHashtags());
 			
 		} catch (InvalidInputException e) {
 			e.printStackTrace();
