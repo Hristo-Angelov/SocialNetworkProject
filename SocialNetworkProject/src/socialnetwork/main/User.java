@@ -1,13 +1,14 @@
 package socialnetwork.main;
 
 import java.io.File;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
 
 import exceptions.InvalidInputException;
 import interfaces.IUser;
 
-public class User implements IUser {
+public class User implements IUser, Serializable {
 
 	// password dimensions
 	private static final int MIN_PASSWORD_LENGTH = 8;
@@ -35,7 +36,15 @@ public class User implements IUser {
 	private final Set<User> followedUsers = new HashSet<User>();
 	private final List<User> followRequests = new ArrayList<User>();
 
+	public User() {
+		this.joinDate = LocalDate.now();
+		this.username = "";
+		this.password = "";
+		this.email = "";
+	}
+
 	public User(String username, String password, String email) throws InvalidInputException {
+		this();
 		if (Validator.isValidString(username, MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH)) {
 			this.username = username;
 		}
@@ -45,7 +54,6 @@ public class User implements IUser {
 		if (Validator.isValidEmail(email)) {
 			this.email = email;
 		}
-		this.joinDate = LocalDate.now();
 	}
 
 	public User(String username, String password, String email, DataBase database) throws InvalidInputException {
@@ -163,7 +171,7 @@ public class User implements IUser {
 	 * 
 	 * @param user
 	 *            User to be followed pending approval.
-	 * @throws InvalidInputException 
+	 * @throws InvalidInputException
 	 */
 	public void sendFollowRequest(User user) throws InvalidInputException {
 		if (user.isPrivate) {
