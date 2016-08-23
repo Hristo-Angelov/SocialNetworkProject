@@ -60,6 +60,11 @@ public class Demo {
 			System.out.println("Trending Hashtags:");
 			System.out.println(database.getTrendingHashtags());
 			
+			// 7.Retweeting posts
+			jim.retweet(jamesPost1, new Post("Eto retweetnah tozi post", jim, database));
+			System.out.println("Jim's posts: ");
+			System.out.println(jim.getMyPosts().get(jim.getMyPosts().size()-1));
+			System.out.println(jim.getMyPosts().get(0));
 		} catch (InvalidInputException e) {
 			e.printStackTrace();
 		}

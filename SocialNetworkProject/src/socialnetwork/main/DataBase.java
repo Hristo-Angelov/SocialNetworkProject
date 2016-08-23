@@ -8,7 +8,7 @@ import exceptions.InvalidInputException;
 import socialnetwork.main.Post.Hashtag;
 
 public class DataBase {
-
+	
 	private static final int MAX_NUMBER_OF_TRENDING_HASHTAGS = 10;
 	private Map<Hashtag, ArrayList<Post>> hashtags = new HashMap<Hashtag, ArrayList<Post>>();
 	private Set<User> users = new HashSet<User>();

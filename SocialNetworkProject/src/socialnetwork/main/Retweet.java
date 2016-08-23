@@ -8,7 +8,7 @@ public class Retweet extends Post {
 
 	public Retweet(String text, User poster, Post originalPost, DataBase database) throws InvalidInputException {
 		super(text, poster, database);
-		if (Validator.isValidObject(question)) {
+		if (Validator.isValidObject(originalPost)) {
 			this.question = originalPost;
 		} else {
 			throw new InvalidInputException("This post does not exist anymore");
@@ -19,7 +19,7 @@ public class Retweet extends Post {
 	@Override
 	public String toString() {
 
-		return "Post:" + question.getText() + " Retweet: + " + " " + super.toString();
+		return "Post:" + question.getText() + " Retweet:  " + " " + super.toString();
 	}
 
 }

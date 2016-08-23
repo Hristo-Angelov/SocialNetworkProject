@@ -172,18 +172,17 @@ public class Post {
 		}
 	}
 	
-	public void addReply(Post myRetweet) {
-		// TODO
-	}
+	
 
 	public void reply(Post originalPost) throws InvalidInputException {
 		this.originalPost = originalPost;
-		originalPost.addReply(this);
+		originalPost.addAnswer(this);
 	}
 
 	public Retweet retweet(Post originalPost) throws InvalidInputException {
 		if(Validator.isValidObject(originalPost)){
 			Retweet newRetweet = new Retweet(this.text, this.poster, originalPost, database);
+	
 			originalPost.addRetweet(newRetweet);
 			return newRetweet;
 		}
