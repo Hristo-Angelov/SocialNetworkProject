@@ -39,7 +39,7 @@ public class User implements IUser, Serializable {
 	public User(String username, String password, String email) {
 		this();
 		this.username = username;
-		this.password = password;
+		setPassword(password);
 		this.email = email;
 	}
 
@@ -57,7 +57,11 @@ public class User implements IUser, Serializable {
 	}
 
 	public void setPassword(String password) {
-		this.password = password;
+		this.password = PasswordUtil.generatePasswordHash(password);
+	}
+	
+	public boolean validatePassword(String password) {
+		return PasswordUtil.validatePassword(password, this.password);
 	}
 
 	public List<User> getFollowRequests() {

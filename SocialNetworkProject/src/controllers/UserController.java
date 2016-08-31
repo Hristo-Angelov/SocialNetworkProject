@@ -52,15 +52,21 @@ public class UserController extends HttpServlet {
 			String email = request.getParameter("email");
 
 			// store data in User object
-			User user = new User(username, password, email);
+			User user = new User();
 			String usernameMessage = validateUsername(username);
 			String emailMessage = validateEmail(email);
 			String passwordMessage = validatePassword(password);
 
 			if (usernameMessage == null && emailMessage == null && passwordMessage == null) {
 				url = "/thanks.jsp";
-			} 
-
+				user = new User(usernameMessage, passwordMessage, emailMessage);
+				UserDB.insertUser(user);
+			} else { 
+				user.setUsername(username);
+				user.setEmail(email);
+			}
+			
+			user.setEmail(email);
 			request.setAttribute("user", user);
 			request.setAttribute("usernameMessage", usernameMessage);
 			request.setAttribute("emailMessage", emailMessage);
