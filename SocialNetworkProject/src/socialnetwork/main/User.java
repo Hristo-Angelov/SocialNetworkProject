@@ -10,19 +10,12 @@ import interfaces.IUser;
 
 public class User implements IUser, Serializable {
 
-	// password dimensions
-	private static final int MIN_PASSWORD_LENGTH = 8;
-	private static final int MAX_PASS_WORD_LENGTH = 32;
-	// username dimenstions
-	private static final int MIN_USERNAME_LENGTH = 2;
-	private static final int MAX_USERNAME_LENGTH = 20;
-
 	// required fields
 	private String username;
 	private String password;
 	private String email;
 	private final LocalDate joinDate;
-	private DataBase database;
+	private DataBase database; // unnecessary beyond console demo
 
 	// changeable user inforamtion
 	private File picture;
@@ -43,35 +36,40 @@ public class User implements IUser, Serializable {
 		this.email = "";
 	}
 
-	public User(String username, String password, String email) throws InvalidInputException {
+	public User(String username, String password, String email) {
 		this();
-		if (Validator.isValidString(username, MIN_USERNAME_LENGTH, MAX_USERNAME_LENGTH)) {
-			this.username = username;
-		}
-		if (Validator.isValidString(password, MIN_PASSWORD_LENGTH, MAX_PASS_WORD_LENGTH)) {
-			this.password = password;
-		}
-		if (Validator.isValidEmail(email)) {
-			this.email = email;
-		}
+		this.username = username;
+		this.password = password;
+		this.email = email;
 	}
 
-	public User(String username, String password, String email, DataBase database) throws InvalidInputException {
+	public User(String username, String password, String email, DataBase database) {
 		this(username, password, email);
-		if (Validator.isValidObject(database)) {
-			this.database = database;
-		}
+		this.database = database;
 	}
-	// public void LogIn(String username, String password) {
-	// TODO
-	// }
-	//
 
-	public void changePassword(String newPassword) throws InvalidInputException {
-		if (Validator.isValidString(newPassword, MIN_PASSWORD_LENGTH, MAX_PASS_WORD_LENGTH)
-				&& (!this.password.equals(newPassword))) {
-			this.password = newPassword;
-		}
+	public void changePassword(String newPassword) {
+		this.password = newPassword;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public List<User> getFollowRequests() {
+		return followRequests;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getEmail() {
@@ -269,7 +267,7 @@ public class User implements IUser, Serializable {
 		} catch (Exception e) {
 			throw new InvalidInputException("Cannot retweet a non-existent post.", e);
 		}
-//		addPost(myRetweet);
+		// addPost(myRetweet);
 
 	}
 
