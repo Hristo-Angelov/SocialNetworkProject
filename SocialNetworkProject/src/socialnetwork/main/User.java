@@ -59,10 +59,6 @@ public class User implements IUser, Serializable {
 	public void setPassword(String password) {
 		this.password = PasswordUtil.generatePasswordHash(password);
 	}
-	
-	public boolean validatePassword(String password) {
-		return PasswordUtil.validatePassword(password, this.password);
-	}
 
 	public List<User> getFollowRequests() {
 		return followRequests;
