@@ -26,7 +26,7 @@ public class UserController extends HttpServlet {
 	private static final int MIN_USERNAME_LENGTH = 2;
 	private static final int MAX_USERNAME_LENGTH = 20;
 	// username pattern
-	private static final Pattern USERNAME_REGEX = Pattern.compile("^(?=.{1,20}$)[a-zA-Z0-9_]+");
+	private static final Pattern USERNAME_REGEX = Pattern.compile("[a-zA-Z0-9_]+");
 	// email pattern
 	private static final Pattern EMAIL_REGEX = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$",
 			Pattern.CASE_INSENSITIVE);
@@ -59,13 +59,13 @@ public class UserController extends HttpServlet {
 
 			if (usernameMessage == null && emailMessage == null && passwordMessage == null) {
 				url = "/thanks.jsp";
-				user = new User(usernameMessage, passwordMessage, emailMessage);
+				user = new User(username, password, email);
 				UserDB.insertUser(user);
-			} else { 
+			} else {
 				user.setUsername(username);
 				user.setEmail(email);
 			}
-			
+
 			user.setEmail(email);
 			request.setAttribute("user", user);
 			request.setAttribute("usernameMessage", usernameMessage);
@@ -110,14 +110,22 @@ public class UserController extends HttpServlet {
 	private String validateUsername(String username) {
 		String usernameMessage;
 		if (username != null && !username.trim().isEmpty()) {
-			if (USERNAME_REGEX.matcher(username).matches()) {
-				if (UserDB.isUsernameAvailable(username)) {
-					usernameMessage = null;
+			if (username.length() >= MIN_USERNAME_LENGTH) {
+				if (username.length() <= MAX_USERNAME_LENGTH) {
+					if (USERNAME_REGEX.matcher(username).matches()) {
+						if (UserDB.isUsernameAvailable(username)) {
+							usernameMessage = null;
+						} else {
+							usernameMessage = "This username is already taken!";
+						}
+					} else {
+						usernameMessage = "Your username can only contain letters, numbers and '_'.";
+					}
 				} else {
-					usernameMessage = "This username is already taken!";
+					usernameMessage = "Username cannot be longerer than " + MAX_USERNAME_LENGTH + " characters long.";
 				}
 			} else {
-				usernameMessage = "Your username can only contain letters, numbers and '_'.";
+				usernameMessage = "Username cannot be shorter than " + MIN_USERNAME_LENGTH + " characters long.";
 			}
 		} else {
 			usernameMessage = "Username field is empty.";
