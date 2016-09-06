@@ -1,6 +1,7 @@
 package socialnetwork.main;
 
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import exceptions.InvalidInputException;
 

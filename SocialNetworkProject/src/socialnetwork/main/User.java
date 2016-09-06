@@ -2,8 +2,16 @@ package socialnetwork.main;
 
 import java.io.File;
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import exceptions.InvalidInputException;
 import interfaces.IUser;
@@ -15,6 +23,7 @@ public class User implements IUser, Serializable {
 	private String password;
 	private String email;
 	private final LocalDate joinDate;
+	private int idInDatabase;
 	private DataBase database; // unnecessary beyond console demo
 
 	// changeable user inforamtion
@@ -109,12 +118,52 @@ public class User implements IUser, Serializable {
 		return myPosts;
 	}
 
-	public void addPost(Post post) throws InvalidInputException {
-		try {
-			if (Validator.isValidObject(post)) {
-				this.myPosts.add(post);
+
+	private int getUserDbId() {
+		int userId = 0;
+
+		try (Connection connection = DataBase.getConnection();) {
+
+			Statement statement = connection.createStatement();
+			ResultSet set = statement
+					.executeQuery("select user_number from users where username = '" + this.getUsername() + "'");
+
+			if (set.first()) {
+				userId = set.getInt(1);
 			}
-		} catch (InvalidInputException e) {
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return userId;
+
+	}
+
+
+	public void addPost(Post post) throws InvalidInputException {
+		if (Validator.isValidObject(post)) {
+			this.myPosts.add(post);
+			try(Connection con = DataBase.getConnection()) {
+				
+				
+				PreparedStatement statement = con.prepareStatement("insert into posts (idpost,create_time, text,user_number)values(?,?,?,?)");
+	
+				statement.setInt(1, post.getPostId());
+				statement.setString(2, post.getDateWhenPosted().toString());
+				statement.setString(3, post.getText());
+				statement.setInt(4, this.getUserDbId());
+				int rows = statement.executeUpdate();
+				System.out.println("posts entered" + rows);
+				
+
+				// statement = DataBase.generatePreparedStatement(query);
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		} else {
+
 			throw new InvalidInputException("Error! Can't post a non-existant post.");
 		}
 	}
@@ -262,7 +311,18 @@ public class User implements IUser, Serializable {
 	public void retweet(Post originalPost, Post myRetweet) throws InvalidInputException {
 		try {
 			if (Validator.isValidObject(originalPost)) {
-				addPost(myRetweet.retweet(originalPost));
+				Retweet retweet = myRetweet.retweet(originalPost);
+				addPost(retweet);
+				try(Connection con = DataBase.getConnection()){
+					Statement statement = con.createStatement();
+					statement.executeUpdate("update posts set question_post  = '" + originalPost.getPostId() +"' where idpost = '" + retweet.getPostId()+"'");
+					PreparedStatement prepStatement = con.prepareStatement("insert into retweets (idretweet,text)values(?,?)");
+					prepStatement.setInt(1,retweet.getPostId());
+					prepStatement.setString(2, retweet.getText());
+					prepStatement.executeUpdate();
+				}catch (SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		} catch (Exception e) {
 			throw new InvalidInputException("Cannot retweet a non-existent post.", e);
