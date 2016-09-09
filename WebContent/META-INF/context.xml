@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context path="/ch12email">
-    <Resource name="jdbc/twitsDB" auth="Container" 
+<Context>
+    <Resource name="jdbc/testdb" auth="Container" 
         driverClassName="com.mysql.jdbc.Driver" 
-        url="jdbc:mysql://localhost:3306/twits" 
-        username="root" password="sesame" 
+        url="jdbc:mysql://localhost:3306/mydb" 
+        username="root" password="003131" 
         autoReconnect="true"
         maxActive="100" maxIdle="30" maxWait="10000" 
         logAbandoned="true" removeAbandoned="true" 

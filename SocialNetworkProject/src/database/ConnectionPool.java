@@ -2,6 +2,7 @@ package database;
 
 import java.sql.*;
 
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
@@ -13,8 +14,9 @@ public class ConnectionPool {
 	
 	private ConnectionPool() {
 		try {
-			InitialContext ic = new InitialContext();
-			dataSource = (DataSource) ic.lookup("java:comp/env/jdbc/twitsDB");
+			Context initContext  = new InitialContext();
+			Context envContext  = (Context)initContext.lookup("java:/comp/env");
+			dataSource = (DataSource)envContext.lookup("jdbc/testdb");
 		} catch (NamingException e) {
 			System.out.println(e);
 		}

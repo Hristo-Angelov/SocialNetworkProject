@@ -7,7 +7,7 @@
 <p>To join, enter your name and
    email address below.</p>
 
-<form action="registration" method="post">
+<form action="home" method="post">
     <input type="hidden" name="action" value="register"> 
     <label class="pad_top">Username:</label>
     <input type="text" name="username" value="${user.username}">
@@ -26,6 +26,7 @@
 	</c:if><br>       
     <label>&nbsp;</label>
     <input type="submit" value="Join Now" class="margin_left">
-</form>
+</form><br>
+<a href="login.jsp">Already have an account?</a>
 
 <c:import url="/includes/footer.jsp" />

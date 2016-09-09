@@ -7,6 +7,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import database.UserDAO;
 import database.UserDAOImpl;
@@ -22,46 +23,79 @@ public class UserController extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		
+		request.setCharacterEncoding("UTF-8");
 		String url = "/reglog.jsp";
+		
+		HttpSession session = request.getSession();
 
 		// get current action
 		String action = request.getParameter("action");
 		if (action == null) {
-			action = "join"; // default action
+			action = "home"; // default action
 		}
 
 		// perform action and set URL to appropriate page
-		if (action.equals("join")) {
-			url = "/index.jsp"; // the "join" page
-		} else if (action.equals("register")) {
-			// get parameters from the request
-			String username = request.getParameter("username");
-			String password = request.getParameter("password");
-			String email = request.getParameter("email");
+		if (action.equals("home")) {
+			url = "/reglog.jsp"; // the "join" page
+		} else {
+			if (action.equals("register")) {
+				// get parameters from the request
+				String username = request.getParameter("username");
+				String password = request.getParameter("password");
+				String email = request.getParameter("email");
 
-			// store data in User object
-			User user = new User();
-			String usernameMessage = RegistrationValidation.validateUsername(username);
-			String emailMessage = RegistrationValidation.validateEmail(email);
-			String passwordMessage = RegistrationValidation.validatePassword(password);
+				// store data in User object
+				User user = new User();
+				String usernameMessage = RegistrationValidation.validateUsername(username);
+				String emailMessage = RegistrationValidation.validateEmail(email);
+				String passwordMessage = RegistrationValidation.validatePassword(password);
 
-			if (usernameMessage == null && emailMessage == null && passwordMessage == null) {
-				url = "/thanks.jsp";
-				user = new User(username, password, email);
-				UserDAO userDao = UserDAOImpl.getInstance();
-				userDao.insertUser(user);
+				if (usernameMessage == null && emailMessage == null && passwordMessage == null) {
+					url = "/thanks.jsp";
+					user = new User(username, password, email);
+					UserDAO userDao = UserDAOImpl.getInstance();
+					userDao.insertUser(user);
+					user = setUserToSession(session, user);
+				} else {
+					url = "/registration.jsp";
+					request.setAttribute("usernameMessage", usernameMessage);
+					request.setAttribute("emailMessage", emailMessage);
+					request.setAttribute("passwordMessage", passwordMessage);
+					request.setAttribute("user", user);
+				}
 			} else {
-				user.setUsername(username);
-				user.setEmail(email);
-			}
+				if (action.equals("login")) {
+					// get parameters from the request
+					String username = request.getParameter("username");
+					String password = request.getParameter("password");
 
-			user.setEmail(email);
-			request.setAttribute("user", user);
-			request.setAttribute("usernameMessage", usernameMessage);
-			request.setAttribute("emailMessage", emailMessage);
-			request.setAttribute("passwordMessage", passwordMessage);
+					// store data in User object
+					User user = new User();
+					user.setUsername(username);
+					user.setPassword(password);
+					String message = UserAuthentication.validateUser(user);
+
+					if (message == null) {
+						url = "/feed.jsp";
+						user = setUserToSession(session, user);
+					} else {
+						url = "/login.jsp";
+						request.setAttribute("message", message);
+					}
+					request.setAttribute("user", user);
+				}
+			}
 		}
+
 		getServletContext().getRequestDispatcher(url).forward(request, response);
+	}
+
+	private User setUserToSession(HttpSession session, User user) {
+		UserDAO userDao = UserDAOImpl.getInstance();
+		user = userDao.selectUser(user.getUsername());
+		session.setAttribute("user", user);
+		return user;
 	}
 
 	@Override

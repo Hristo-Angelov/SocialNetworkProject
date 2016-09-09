@@ -9,6 +9,13 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 public class PasswordUtil {
+	
+	public static void main(String[] args) {
+		String pass1 = PasswordUtil.generatePasswordHash("asdadassdsdfsfvdfvdfvdfdasd");
+		String pass2 = PasswordUtil.generatePasswordHash("asdadasdasaasdad");
+		System.out.println(pass1.length() + ": " + pass1);
+		System.out.println(pass2.length() + ": " + pass2);
+	}
 
 	public static String generatePasswordHash(String password) {
 		try {

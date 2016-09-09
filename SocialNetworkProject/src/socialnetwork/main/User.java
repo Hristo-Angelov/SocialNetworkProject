@@ -11,6 +11,7 @@ import interfaces.IUser;
 public class User implements IUser, Serializable {
 
 	// required fields
+	private int userId;
 	private String username;
 	private String password;
 	private String email;
@@ -279,4 +280,13 @@ public class User implements IUser, Serializable {
 	public String toString() {
 		return this.username;
 	}
+
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+	
 }
