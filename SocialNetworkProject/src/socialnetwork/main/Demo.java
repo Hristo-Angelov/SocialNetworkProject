@@ -14,6 +14,7 @@ public class Demo {
 			User james = new User("James", "streongestPassword", "zxc@gmail.com", database);
 			
 			// 3. Follow/Unfollow
+		
 			System.out.println(james + " follows " + jim);
 			james.sendFollowRequest(jim);
 			System.out.println(jim + " Followers: " + jim.getFollowers().size());
@@ -45,10 +46,12 @@ public class Demo {
 			jim.addPost(jimPost1);
 			john.likePost(jimPost1);
 			james.likePost(jimPost1);
-			Post jamesPost1 = new Post("@Jim Congrats! #greatPost", james, database);
+			Post jamesPost1 = new Post("@Jim Congrats! #greatPost #greatConsoleDemo", james, database);
 			james.reply(jimPost1, jamesPost1);
 			System.out.println(jim.getMyPosts().get(0));
 			System.out.println(jamesPost1);
+			Post newPost = new Post("Az sym nov post", jim, database);
+			jim.addPost(newPost);
 			
 			
 			// 5. Trending hashtags
@@ -65,6 +68,10 @@ public class Demo {
 			System.out.println("Jim's posts: ");
 			System.out.println(jim.getMyPosts().get(jim.getMyPosts().size()-1));
 			System.out.println(jim.getMyPosts().get(0));
+			
+			database.addUser(james);
+			database.addUser(john);
+			database.addUser(jim);
 		} catch (InvalidInputException e) {
 			e.printStackTrace();
 		}

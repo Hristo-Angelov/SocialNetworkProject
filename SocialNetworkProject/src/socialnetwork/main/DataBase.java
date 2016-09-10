@@ -1,33 +1,42 @@
 package socialnetwork.main;
 
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Matcher;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import exceptions.InvalidInputException;
 import socialnetwork.main.Post.Hashtag;
 
 public class DataBase {
-	
+
 	private static final int MAX_NUMBER_OF_TRENDING_HASHTAGS = 10;
 	private Map<Hashtag, ArrayList<Post>> hashtags = new HashMap<Hashtag, ArrayList<Post>>();
 	private Set<User> users = new HashSet<User>();
 
-	// public void addHashtagPost(Hashtag hashtag, Post post) throws
-	// InvalidInputException {
-	// if (Validator.isValidObject(hashtag) && Validator.isValidObject(post)) {
-	// hashtag.increaseHashtagCount();
-	// if (hashtags.containsKey(hashtag)) {
-	// hashtags.get(hashtag).add(post);
-	// } else {
-	// hashtags.put(hashtag, new ArrayList<Post>());
-	// hashtags.get(hashtag).add(post);
-	//
-	// }
-	// } else {
-	// throw new InvalidInputException("Not valid post or hashtag!");
-	// }
-	// }
+	private Connection connection;
+
+	public DataBase() {
+		try {
+			this.connection = DataBase.getConnection();
+			
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	public void validateHashTags() {
 		for (Entry<Hashtag, ArrayList<Post>> key : hashtags.entrySet()) {
@@ -38,8 +47,68 @@ public class DataBase {
 		}
 	}
 
+	public Map<Hashtag, ArrayList<Post>> getHashtags() {
+		return hashtags;
+	}
+
+	public Set<User> getUsers() {
+		return users;
+	}
+
+	public static Connection getConnection() throws SQLException {
+		String sql = "jdbc:mysql://localhost:3306/";
+		String database = "mydb";
+		String user = "root";
+		String pass = "003131";
+		return DriverManager.getConnection(sql + database, user, pass);
+
+	}
+
 	public ArrayList<Post> getPosts(String hashTag) {
 		return (ArrayList<Post>) Collections.unmodifiableList(hashtags.get(hashTag));
+	}
+
+	private void enterIsPrivateStatements() {
+		Connection connection;
+		try {
+			connection = DataBase.getConnection();
+			String query = "insert into is_private (number,isPrivate)" + "values('1','1'),('2','2')";
+			Statement statement = connection.createStatement();
+			int numberOfRows = statement.executeUpdate(query);
+			System.out.println("Number of rows inserted " + numberOfRows);
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public static PreparedStatement generatePreparedStatement(String query) {
+		PreparedStatement statement = null;
+		try (Connection connection = DataBase.getConnection();) {
+
+			statement = connection.prepareStatement("insert into posts (create_time,text,user_number)values(?,?,?)");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return statement;
+
+	}
+
+	public static Statement generateStatement() {
+		Statement statement = null;
+		try (Connection connection = DataBase.getConnection();) {
+
+			statement = connection.createStatement();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return statement;
+
 	}
 
 	public void updatePublicPosts() {
@@ -49,6 +118,22 @@ public class DataBase {
 	public void addUser(User user) throws InvalidInputException {
 		if (user != null) {
 			users.add(user);
+
+			try (Statement state = connection.createStatement();) {
+
+				int isPrivateNumber = (user.isPrivate() == false) ? 1 : 2;
+				PreparedStatement statement = connection.prepareStatement("insert into users"
+						+ "(username,email,password,create_time, is_private)" + "values (?,?,?,?,?)");
+				statement.setString(1, user.getUsername());
+				statement.setString(2, user.getEmail());
+				statement.setString(3, user.getPassword());
+				statement.setString(4, user.getJoinDate().toString());
+				statement.setInt(5, isPrivateNumber);
+				statement.executeUpdate();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} else {
 			throw new InvalidInputException("Not valid User");
 		}
@@ -76,6 +161,7 @@ public class DataBase {
 				for (Hashtag tag : this.hashtags.keySet()) {
 					if (tag.equals(hashtag)) {
 						tag.increaseHashtagCount();
+						
 					}
 				}
 			} else {
@@ -100,14 +186,17 @@ public class DataBase {
 	}
 
 	public void deleteHashTag(Hashtag hashtag) throws InvalidInputException {
-		if(Validator.isValidObject(hashtag)){
-			if(hashtags.containsKey(hashtag)){
-				hashtags.remove(hashtag);
+		if (Validator.isValidObject(hashtag)) {
+			if (hashtags.containsKey(hashtag)) {
+				synchronized (hashtags) {
+					hashtags.remove(hashtag);
+				}
+
 			}
-		}else{
+		} else {
 			throw new InvalidInputException("Not valid hashtag!");
 		}
-		
+
 	}
 
 }

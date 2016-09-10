@@ -1,9 +1,16 @@
 package socialnetwork.main;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,6 +18,7 @@ import exceptions.InvalidInputException;
 
 public class Post {
 
+	private static final int START_COUNT_VALUE = 1;
 	// private constants
 	private static final int MIN_POST_LENGTH = 1;
 	private static final int MAX_POST_LENGTH = 140;
@@ -18,16 +26,29 @@ public class Post {
 
 	// private fields
 	private String text;
+
+	public void setPostId(int postId) {
+		this.postId = postId;
+	}
+
+	public Post getOriginalPost() {
+	
+			return originalPost;
+		
+	}
+
 	private User poster;
 	private LocalDateTime dateWhenPosted;
+	private int postId;
 	private Post originalPost;
+	private static int idCounter = 0;
 	private DataBase database;
 	private List<User> likes = new ArrayList<User>();
 	private List<Post> replies = new ArrayList<Post>();
 	private List<Post> retweets = new ArrayList<Post>();
 	private List<Hashtag> hashtags = new ArrayList<Hashtag>();
 
-	public Post(String text, User poster , DataBase database) throws InvalidInputException {
+	public Post(String text, User poster, DataBase database) throws InvalidInputException {
 		if (Validator.isValidString(text, MIN_POST_LENGTH, MAX_POST_LENGTH))
 			this.text = text;
 		if (poster != null) {
@@ -35,20 +56,24 @@ public class Post {
 		} else {
 			throw new InvalidInputException("Not valid poster");
 		}
-		if(Validator.isValidObject(database)){
+		if (Validator.isValidObject(database)) {
 			this.database = database;
-			
-		}else{
+
+		} else {
 			throw new InvalidInputException("Invalid database");
 		}
 		this.dateWhenPosted = LocalDateTime.now();
 		this.findHashtags(text);
+		Post.idCounter++;
+		this.postId = Post.idCounter;
 	}
 
 	public class Hashtag implements Comparable<Hashtag> {
 
 		private String name;
 		private int count;
+	
+		private int hashtagId;
 		private LocalDate dateWhenCreated = LocalDate.now();
 
 		public Hashtag(String name) throws InvalidInputException {
@@ -56,17 +81,22 @@ public class Post {
 				this.name = name;
 			}
 			this.count = 1;
+		
 
 		}
 
 		public void increaseHashtagCount() {
 			this.count++;
+			
+				
+				
+			
 		}
-		
-		public void decreaseHashtagCount() throws InvalidInputException{
-			if(this.count >1){
-			this.count--;
-			}else{
+
+		public void decreaseHashtagCount() throws InvalidInputException {
+			if (this.count > 1) {
+				this.count--;
+			} else {
 				Post.this.database.deleteHashTag(this);
 			}
 		}
@@ -82,6 +112,16 @@ public class Post {
 
 		public int getCount() {
 			return count;
+		}
+		
+		
+
+		public int getHashtagId() {
+			return hashtagId;
+		}
+
+		public void setHashtagId(int hashtagId) {
+			this.hashtagId = hashtagId;
 		}
 
 		@Override
@@ -120,6 +160,10 @@ public class Post {
 
 	public String getText() {
 		return this.text;
+	}
+
+	public int getPostId() {
+		return postId;
 	}
 
 	public void deleteLike(Post post) throws InvalidInputException {
@@ -167,12 +211,10 @@ public class Post {
 			for (Post post : replies) {
 				System.out.println(post);
 			}
-		}else{
+		} else {
 			System.out.println("No replies yet");
 		}
 	}
-	
-	
 
 	public void reply(Post originalPost) throws InvalidInputException {
 		this.originalPost = originalPost;
@@ -180,18 +222,20 @@ public class Post {
 	}
 
 	public Retweet retweet(Post originalPost) throws InvalidInputException {
-		if(Validator.isValidObject(originalPost)){
+		if (Validator.isValidObject(originalPost)) {
 			Retweet newRetweet = new Retweet(this.text, this.poster, originalPost, database);
-	
+			
 			originalPost.addRetweet(newRetweet);
+			
+			
 			return newRetweet;
 		}
 		return null;
 	}
+
 	
-	
-	public void addRetweet(Retweet retweet) throws InvalidInputException{
-		if(Validator.isValidObject(retweet)){
+	public void addRetweet(Retweet retweet) throws InvalidInputException {
+		if (Validator.isValidObject(retweet)) {
 			retweets.add(retweet);
 		}
 	}
@@ -212,8 +256,6 @@ public class Post {
 		return likes;
 	}
 
-	
-
 	public void addLike(User user) {
 		likes.add(user);
 	}
@@ -221,10 +263,26 @@ public class Post {
 	private void findHashtags(String text) throws InvalidInputException {
 		Matcher matcher = Post.HASHTAG_REGEX.matcher(text);
 		while (matcher.find()) {
-			hashtags.add(new Hashtag(matcher.group(0)));
+			Hashtag hashtag = new Hashtag(matcher.group(0));
+			hashtags.add(hashtag);
+			try(Connection conn = DataBase.getConnection()){
+			PreparedStatement statement = conn.prepareStatement("insert into hashtags (text, count ) values (?,?)");
+			statement.setString(1, matcher.group(0));
+			statement.setInt(2, START_COUNT_VALUE);
+			statement.executeUpdate();
+			Statement state = conn.createStatement();
+			ResultSet set = state.executeQuery("select idhashtags from hastags where idhashtags = '"+matcher.group(0)+"'");
+			hashtag.setHashtagId(set.getInt(1));
+			set.close();
+			} catch (SQLException e) {
+				
+				e.printStackTrace();
+			}
+			
+			
 		}
 		database.addHashtags(this);
-		
+
 	}
 
 	public List<Hashtag> getHashtags() {
@@ -240,14 +298,14 @@ public class Post {
 	}
 
 	public void delete() throws InvalidInputException {
-		if(hashtags.size()>0){
+		if (hashtags.size() > 0) {
 			for (Hashtag hashtag : hashtags) {
 				hashtag.decreaseHashtagCount();
 			}
-		}else{
+		} else {
 			System.out.println("No hashtags in this post.");
 		}
-		
+
 	}
 
 }
