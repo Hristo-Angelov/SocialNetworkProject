@@ -168,9 +168,31 @@ public class PostDAOImpl implements PostDAO {
 	}
 
 	@Override
-	public List<Post> getNewsfeed(User user) {
+	public Set<Post> getNewsfeed(User user) {
+		Set<Post> newsFeed = new TreeSet<Post>((p1, p2) -> p1.getDateWhenPosted().compareTo(p2.getDateWhenPosted()));
 
-		return null;
+		Connection connection = pool.getConnection();
+		String followersQuery = "SELECT p.* FROM users u "
+				+ "JOIN followers f ON(u.user_id = f.follower_id)"
+				+ "JOIN followers s ON(f.follower_id = s.subject_id)" 
+				+ "JOIN users m ON(s.subject_id = m.user_id)"
+				+ "JOIN posts p ON(m.user_id = p.user_id) WHERE user_id = " + user.getUserId();
+		
+		try (PreparedStatement ps = connection.prepareStatement(followersQuery);
+				ResultSet rs = ps.executeQuery();) {
+
+			while (rs.next()) {
+				int id = rs.getInt("post_id");
+				newsFeed.add(this.selectPost(id));
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(connection);
+		}
+		return newsFeed;
 	}
 
 	@Override
