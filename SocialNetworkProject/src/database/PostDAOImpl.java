@@ -35,7 +35,7 @@ public class PostDAOImpl implements PostDAO {
 		Connection connection = pool.getConnection();
 		PreparedStatement st = null;
 
-		String query = "INSERT INTO posts (user_id,text,original_post_id,create_time, post_type) "
+		String query = "INSERT INTO posts (user_id,text,original_post_id, post_type ,create_time) "
 				+ "VALUES (?,?,?,?,now())";
 		try {
 			st = connection.prepareStatement(query);
