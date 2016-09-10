@@ -24,7 +24,7 @@ public class DBUtil {
 		}
 	}
 	
-	public static void closeResultStatement(Statement rs) {
+	public static void closeResultSet(ResultSet rs) {
 		try {
 			if (rs != null) {
 				rs.close();

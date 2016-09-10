@@ -16,7 +16,5 @@ public interface UserDAO {
 	
 	public void removeUser(User user);
 	
-	public boolean usernameExists(String username);
-	
 	public String getUserPasswordHash(String username);
 }

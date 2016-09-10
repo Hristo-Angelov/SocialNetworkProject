@@ -9,6 +9,10 @@ import javax.crypto.spec.PBEKeySpec;
 
 public class PasswordUtil {
 
+	public static void main(String[] args) {
+		generatePasswordHash("pass");
+	}
+	
 	public static String generatePasswordHash(String password) {
 		try {
 			int iterations = 1001;
@@ -18,7 +22,9 @@ public class PasswordUtil {
 			PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 64 * 8);
 			SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
 			byte[] hash = skf.generateSecret(spec).getEncoded();
-			return iterations + ":" + toHex(salt) + ":" + toHex(hash);
+			String has = iterations + ":" + toHex(salt) + ":" + toHex(hash);
+			System.out.println("entered password: " + password + "; generate this: " + has);
+			return has;
 		} catch (Exception e) {
 			System.err.println("Password hash generation failed.");
 			e.printStackTrace();
@@ -61,7 +67,7 @@ public class PasswordUtil {
 			}
 			return diff == 0;
 		} catch (Exception e) {
-			System.err.println("Password validation has failed.");
+			System.err.println("Password validation has failed." + e.getMessage());
 			return false;
 		}
 	}

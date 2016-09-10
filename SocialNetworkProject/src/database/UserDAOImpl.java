@@ -22,8 +22,25 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	public boolean isUsernameAvailable(String username) {
-		// TODO Auto-generated method stub
-		return true;
+		Connection connection = pool.getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		
+		String query = "SELECT username FROM users u "
+				+ "WHERE u.username = ?";
+		try {
+			ps = connection.prepareStatement(query);
+			ps.setString(1, username);
+			rs = ps.executeQuery();
+			return !rs.next();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			DBUtil.closeResultSet(rs);
+			DBUtil.closePreparedStatement(ps);
+			pool.freeConnection(connection);
+		}
 	}
 
 	public boolean isEmailAvailable(String email) {
@@ -34,15 +51,15 @@ public class UserDAOImpl implements UserDAO {
 	public void insertUser(User user) {
 		Connection connection = pool.getConnection();
 		PreparedStatement ps = null;
-
+		System.out.println("inserting user: " + user.getUsername());
 		String query = "INSERT INTO users (username, email, password, registration_date, is_private) "
 				+ "VALUES (?, ?, ?, now(), false)";
-
+		String hashedPass = PasswordUtil.generatePasswordHash(user.getPassword());
 		try {
 			ps = connection.prepareStatement(query);
 			ps.setString(1, user.getUsername());
 			ps.setString(2, user.getEmail());
-			ps.setString(3, PasswordUtil.generatePasswordHash(user.getPassword()));
+			ps.setString(3, hashedPass);
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -80,6 +97,7 @@ public class UserDAOImpl implements UserDAO {
 				user.setUsername(rs.getString("username"));
 				user.setEmail(rs.getString("email"));
 				user.setUserId(rs.getInt("user_id"));
+				user.setPassword(rs.getString("password"));
 			}
 			return user;
 		} catch (SQLException e) {
@@ -92,15 +110,10 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public boolean usernameExists(String username) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public String getUserPasswordHash(String username) {
-		// TODO Auto-generated method stub
-		return null;
+		String pass = selectUser(username).getPassword().trim();
+		System.out.println("retreiving this: " + pass);
+		return pass;
 	}
 
 }

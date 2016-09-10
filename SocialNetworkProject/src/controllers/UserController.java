@@ -68,7 +68,6 @@ public class UserController extends HttpServlet {
 					// get parameters from the request
 					String username = request.getParameter("username");
 					String password = request.getParameter("password");
-					System.out.println(password);
 
 					// store data in User object
 					User user = new User();
@@ -77,13 +76,13 @@ public class UserController extends HttpServlet {
 					String message = UserAuthentication.validateUser(user);
 
 					if (message == null) {
-						url = "/feed.jsp";
+						url = "/newsfeed.jsp";
 						user = setUserToSession(session, user);
 					} else {
 						url = "/login.jsp";
 						request.setAttribute("message", message);
+						request.setAttribute("user", user);
 					}
-					request.setAttribute("user", user);
 				}
 			}
 		}

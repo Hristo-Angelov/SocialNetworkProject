@@ -10,7 +10,7 @@ public class UserAuthentication {
 	public static String validateUser(User user) {
 		UserDAO userDao = UserDAOImpl.getInstance();
 		String username = user.getUsername();
-		if (userDao.usernameExists(username)) {
+		if (!userDao.isUsernameAvailable(username)) {
 			if (PasswordUtil.validatePassword(user.getPassword(), userDao.getUserPasswordHash(username))) {
 				return null;
 			} else {
