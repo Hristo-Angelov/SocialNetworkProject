@@ -163,6 +163,7 @@ public class PostDAOImpl implements PostDAO {
 
 	@Override
 	public List<Post> getUserPosts(User user) {
+		
 
 		return null;
 	}

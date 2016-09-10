@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 
 import exceptions.InvalidInputException;
 
-public class Post {
+public class Post implements Comparable<Post>{
 
 	private static final int START_COUNT_VALUE = 1;
 	// private constants
@@ -360,6 +360,12 @@ public class Post {
 			System.out.println("No hashtags in this post.");
 		}
 
+	}
+
+	@Override
+	public int compareTo(Post o) {
+		
+		return this.getDateWhenPosted().compareTo(o.getDateWhenPosted());
 	}
 
 }
