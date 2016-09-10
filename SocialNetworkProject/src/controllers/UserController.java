@@ -1,6 +1,8 @@
 package controllers;
 
 import java.io.IOException;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,8 +11,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import database.PostDAOImpl;
 import database.UserDAO;
 import database.UserDAOImpl;
+import socialnetwork.main.Post;
 import socialnetwork.main.User;
 
 /**
@@ -78,6 +82,10 @@ public class UserController extends HttpServlet {
 					if (message == null) {
 						url = "/newsfeed.jsp";
 						user = setUserToSession(session, user);
+//						Set<Post> feed = PostDAOImpl.getInstance().getNewsfeed(user);
+						Set<Post> feed = new TreeSet<Post>();
+						feed.add(PostDAOImpl.getInstance().selectPost(1));
+						request.setAttribute("feed", feed);
 					} else {
 						url = "/login.jsp";
 						request.setAttribute("message", message);

@@ -112,7 +112,6 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public String getUserPasswordHash(String username) {
 		String pass = selectUser(username).getPassword().trim();
-		System.out.println("retreiving this: " + pass);
 		return pass;
 	}
 

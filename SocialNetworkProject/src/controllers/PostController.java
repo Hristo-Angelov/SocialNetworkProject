@@ -1,6 +1,7 @@
 package controllers;
 
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -10,9 +11,8 @@ import javax.servlet.http.HttpSession;
 
 import database.PostDAO;
 import database.PostDAOImpl;
-import database.UserDAO;
-import database.UserDAOImpl;
 import socialnetwork.main.Post;
+import socialnetwork.main.PostType;
 import socialnetwork.main.User;
 
 /**
@@ -56,7 +56,8 @@ public class PostController extends HttpServlet {
 				Post post = new Post();
 				post.setText(text);
 				post.setPoster(user);
-				if (PostValidation.validatePost(post)) {
+				post.setPostType(PostType.REGULAR);
+				if (PostValidation.validatePost(post, request.getSession())) {
 					url = "/thanks.jsp";
 					PostDAO postDao = PostDAOImpl.getInstance();
 					postDao.insertPost(post);
