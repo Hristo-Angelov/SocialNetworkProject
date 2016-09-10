@@ -33,8 +33,8 @@ public class PostDAOImpl implements PostDAO {
 		Connection connection = pool.getConnection();
 		PreparedStatement st = null;
 
-		String query = "INSERT INTO posts (user_id,text,original_post_id,create_time) " 
-					+ "VALUES (?,?,?,now())";
+		String query = "INSERT INTO posts (user_id,text,original_post_id,create_time, post_type) " 
+					+ "VALUES (?,?,?,?,now())";
 		try {
 			st = connection.prepareStatement(query);
 			User user = post.getPoster();
@@ -46,6 +46,7 @@ public class PostDAOImpl implements PostDAO {
 			} else {
 				st.setInt(3, post.getOriginalPost().getPostId());
 			}
+			st.setInt(4, post.getPostType().ordinal());
 
 			st.executeUpdate();
 
@@ -70,6 +71,7 @@ public class PostDAOImpl implements PostDAO {
 			Statement st = connection.createStatement();
 			ResultSet set = st.executeQuery(query);
 			while(set.next()){
+				
 				post = new Post();
 				originalPostId = set.getInt("original_post");
 				post.setText(set.getString("text"));
@@ -87,7 +89,7 @@ public class PostDAOImpl implements PostDAO {
 
 	@Override
 	public List<Post> getUserPosts(User user) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 

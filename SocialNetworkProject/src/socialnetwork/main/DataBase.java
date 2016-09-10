@@ -30,7 +30,6 @@ public class DataBase {
 	public DataBase() {
 		try {
 			this.connection = DataBase.getConnection();
-			
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -123,7 +122,7 @@ public class DataBase {
 
 				int isPrivateNumber = (user.isPrivate() == false) ? 1 : 2;
 				PreparedStatement statement = connection.prepareStatement("insert into users"
-						+ "(username,email,password,create_time, is_private)" + "values (?,?,?,?,?)");
+						+ "(username,email,password,registration_date, is_private)" + "values (?,?,?,?,?)");
 				statement.setString(1, user.getUsername());
 				statement.setString(2, user.getEmail());
 				statement.setString(3, user.getPassword());
@@ -137,6 +136,49 @@ public class DataBase {
 		} else {
 			throw new InvalidInputException("Not valid User");
 		}
+	}
+
+	public void insertPost(Post post) {
+		Connection conn = null;
+		try {
+			conn = DataBase.getConnection();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		try {
+			
+			
+
+			String query = "INSERT INTO posts ('user_id','text','original_post_id','create_time')"
+					+ " VALUES (?,?,?,now())";
+
+			PreparedStatement st = conn.prepareStatement(query);
+
+			st = connection.prepareStatement(query);
+			st.setInt(1, post.getPoster().getUserId());
+			st.setString(2, post.getText());
+			if (post.getOriginalPost() == null) {
+				st.setInt(3, 2);
+			} else {
+				st.setInt(3, post.getOriginalPost().getPostId());
+			}
+
+			st.executeUpdate();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 	public User getUser(User user) throws InvalidInputException {
@@ -161,7 +203,7 @@ public class DataBase {
 				for (Hashtag tag : this.hashtags.keySet()) {
 					if (tag.equals(hashtag)) {
 						tag.increaseHashtagCount();
-						
+
 					}
 				}
 			} else {

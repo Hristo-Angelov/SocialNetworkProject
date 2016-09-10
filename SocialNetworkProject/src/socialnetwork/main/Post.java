@@ -30,6 +30,7 @@ public class Post {
 	private LocalDateTime dateWhenPosted;
 	private int postId;
 	private Post originalPost;
+	private PostType postType;
 	private static int idCounter = 0;
 	private DataBase database;
 	private List<User> likes = new ArrayList<User>();
@@ -58,9 +59,9 @@ public class Post {
 	}
 
 	public Post() {
-		
+
 	}
-	
+
 	public void setPoster(User poster) {
 		this.poster = poster;
 	}
@@ -70,10 +71,19 @@ public class Post {
 	}
 
 	public Post getOriginalPost() {
-	
+
 		return originalPost;
-		
+
 	}
+
+	public PostType getPostType() {
+		return postType;
+	}
+
+	public void setPostType(PostType postType) {
+		this.postType = postType;
+	}
+
 	public void setText(String text) {
 		this.text = text;
 	}
@@ -90,7 +100,7 @@ public class Post {
 
 		private String name;
 		private int count;
-	
+
 		private int hashtagId;
 		private LocalDate dateWhenCreated = LocalDate.now();
 
@@ -99,13 +109,12 @@ public class Post {
 				this.name = name;
 			}
 			this.count = 1;
-		
 
 		}
 
 		public void increaseHashtagCount() {
 			this.count++;
-		
+
 		}
 
 		public void decreaseHashtagCount() throws InvalidInputException {
@@ -128,8 +137,6 @@ public class Post {
 		public int getCount() {
 			return count;
 		}
-		
-		
 
 		public int getHashtagId() {
 			return hashtagId;
@@ -239,16 +246,14 @@ public class Post {
 	public Retweet retweet(Post originalPost) throws InvalidInputException {
 		if (Validator.isValidObject(originalPost)) {
 			Retweet newRetweet = new Retweet(this.text, this.poster, originalPost, database);
-			
+
 			originalPost.addRetweet(newRetweet);
-			
-			
+
 			return newRetweet;
 		}
 		return null;
 	}
 
-	
 	public void addRetweet(Retweet retweet) throws InvalidInputException {
 		if (Validator.isValidObject(retweet)) {
 			retweets.add(retweet);
@@ -280,21 +285,21 @@ public class Post {
 		while (matcher.find()) {
 			Hashtag hashtag = new Hashtag(matcher.group(0));
 			hashtags.add(hashtag);
-			try(Connection conn = DataBase.getConnection()){
-			PreparedStatement statement = conn.prepareStatement("insert into hashtags (text, count ) values (?,?)");
-			statement.setString(1, matcher.group(0));
-			statement.setInt(2, START_COUNT_VALUE);
-			statement.executeUpdate();
-			Statement state = conn.createStatement();
-			ResultSet set = state.executeQuery("select idhashtags from hastags where idhashtags = '"+matcher.group(0)+"'");
-			hashtag.setHashtagId(set.getInt(1));
-			set.close();
+			try (Connection conn = DataBase.getConnection()) {
+				PreparedStatement statement = conn.prepareStatement("insert into hashtags (text, count ) values (?,?)");
+				statement.setString(1, matcher.group(0));
+				statement.setInt(2, START_COUNT_VALUE);
+				statement.executeUpdate();
+				Statement state = conn.createStatement();
+				ResultSet set = state
+						.executeQuery("select idhashtags from hastags where idhashtags = '" + matcher.group(0) + "'");
+				hashtag.setHashtagId(set.getInt(1));
+				set.close();
 			} catch (SQLException e) {
-				
+
 				e.printStackTrace();
 			}
-			
-			
+
 		}
 		database.addHashtags(this);
 

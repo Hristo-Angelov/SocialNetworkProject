@@ -69,9 +69,10 @@ public class Demo {
 			System.out.println("Jim's posts: ");
 			System.out.println(jim.getMyPosts().get(jim.getMyPosts().size()-1));
 			System.out.println(jim.getMyPosts().get(0));
+			database.addUser(james);
 			
-			PostDAOImpl postdao = new PostDAOImpl();
-			postdao.insertPost(jamesPost1);
+			james.setUserId(1);
+			database.insertPost(jamesPost1);
 		
 		} catch (InvalidInputException e) {
 			e.printStackTrace();
