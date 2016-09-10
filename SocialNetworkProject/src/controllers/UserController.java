@@ -46,14 +46,13 @@ public class UserController extends HttpServlet {
 				String email = request.getParameter("email");
 
 				// store data in User object
-				User user = new User();
+				User user = new User(username, password, email);
 				String usernameMessage = RegistrationValidation.validateUsername(username);
 				String emailMessage = RegistrationValidation.validateEmail(email);
 				String passwordMessage = RegistrationValidation.validatePassword(password);
 
 				if (usernameMessage == null && emailMessage == null && passwordMessage == null) {
 					url = "/thanks.jsp";
-					user = new User(username, password, email);
 					UserDAO userDao = UserDAOImpl.getInstance();
 					userDao.insertUser(user);
 					user = setUserToSession(session, user);
@@ -62,13 +61,14 @@ public class UserController extends HttpServlet {
 					request.setAttribute("usernameMessage", usernameMessage);
 					request.setAttribute("emailMessage", emailMessage);
 					request.setAttribute("passwordMessage", passwordMessage);
-					request.setAttribute("user", user);
+					request.setAttribute("user", user);					
 				}
 			} else {
 				if (action.equals("login")) {
 					// get parameters from the request
 					String username = request.getParameter("username");
 					String password = request.getParameter("password");
+					System.out.println(password);
 
 					// store data in User object
 					User user = new User();
