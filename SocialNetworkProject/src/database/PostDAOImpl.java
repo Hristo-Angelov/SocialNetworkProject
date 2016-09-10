@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import socialnetwork.main.Post;
 import socialnetwork.main.User;
@@ -138,8 +139,7 @@ public class PostDAOImpl implements PostDAO {
 		}
 		String retweetQuery = "SELECT a.* FROM posts p" + "JOIN posts a ON p.post_id = a.original_post_id"
 				+ "WHERE a.post_type = 2;";
-		try (PreparedStatement ps = connection.prepareStatement(retweetQuery);
-				ResultSet rs = ps.executeQuery();) {
+		try (PreparedStatement ps = connection.prepareStatement(retweetQuery); ResultSet rs = ps.executeQuery();) {
 
 			while (rs.next()) {
 				Post newPost = new Post();
@@ -169,14 +169,39 @@ public class PostDAOImpl implements PostDAO {
 
 	@Override
 	public List<Post> getNewsfeed(User user) {
-		
+
 		return null;
 	}
 
 	@Override
-	public List<User> getLikes(Post post) {
-		// TODO Auto-generated method stub
-		return null;
+	public TreeSet<User> getLikes(Post post) {
+
+		Connection connection = pool.getConnection();
+		TreeSet<User> likes = new TreeSet<User>();
+		String queryLikes = "SELECT * FROM posts p " + "join likes l on(p.post_id = l.post)"
+				+ "join users u on(l.user_number = u.user_id)" + "where p.post_id = " + post.getPostId();
+		try (PreparedStatement likesStatement = connection.prepareStatement(queryLikes);
+				ResultSet rs = likesStatement.executeQuery();) {
+
+			while (rs.next()) {
+				User user = new User();
+
+				user.setEmail(rs.getString("email"));
+				user.setPassword(rs.getString("password"));
+				user.setUserId(rs.getInt("user_id"));
+				user.setUsername(rs.getString("username"));
+
+				likes.add(user);
+			}
+			post.setNewLikes(likes);
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(connection);
+		}
+		return likes;
 	}
 
 }

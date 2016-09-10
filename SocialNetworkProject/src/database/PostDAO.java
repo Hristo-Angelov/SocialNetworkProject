@@ -14,7 +14,7 @@ public interface PostDAO {
 
 	public List<Post> getNewsfeed(User user);
 	
-	public List<User> getLikes(Post post);
+	public TreeSet<User> getLikes(Post post);
 	
 
  
