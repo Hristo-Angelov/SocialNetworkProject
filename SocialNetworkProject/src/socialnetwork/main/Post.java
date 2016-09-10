@@ -26,17 +26,6 @@ public class Post {
 
 	// private fields
 	private String text;
-
-	public void setPostId(int postId) {
-		this.postId = postId;
-	}
-
-	public Post getOriginalPost() {
-	
-			return originalPost;
-		
-	}
-
 	private User poster;
 	private LocalDateTime dateWhenPosted;
 	private int postId;
@@ -68,6 +57,31 @@ public class Post {
 		this.postId = Post.idCounter;
 	}
 
+	public Post() {
+		
+	}
+	
+	public void setPostId(int postId) {
+		this.postId = postId;
+	}
+
+	public Post getOriginalPost() {
+	
+		return originalPost;
+		
+	}
+	public void setText(String text) {
+		this.text = text;
+	}
+
+	public void setDateWhenPosted(LocalDateTime dateWhenPosted) {
+		this.dateWhenPosted = dateWhenPosted;
+	}
+
+	public void setOriginalPost(Post originalPost) {
+		this.originalPost = originalPost;
+	}
+
 	public class Hashtag implements Comparable<Hashtag> {
 
 		private String name;
@@ -87,10 +101,7 @@ public class Post {
 
 		public void increaseHashtagCount() {
 			this.count++;
-			
-				
-				
-			
+		
 		}
 
 		public void decreaseHashtagCount() throws InvalidInputException {

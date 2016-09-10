@@ -1,5 +1,6 @@
 package socialnetwork.main;
 
+import database.PostDAOImpl;
 import exceptions.InvalidInputException;
 
 public class Demo {
@@ -69,9 +70,9 @@ public class Demo {
 			System.out.println(jim.getMyPosts().get(jim.getMyPosts().size()-1));
 			System.out.println(jim.getMyPosts().get(0));
 			
-			database.addUser(james);
-			database.addUser(john);
-			database.addUser(jim);
+			PostDAOImpl postdao = new PostDAOImpl();
+			postdao.insertPost(jamesPost1);
+		
 		} catch (InvalidInputException e) {
 			e.printStackTrace();
 		}
