@@ -33,21 +33,23 @@ public class PostDAOImpl implements PostDAO {
 		Connection connection = pool.getConnection();
 		PreparedStatement st = null;
 
-		String query = "INSERT INTO posts ('user_id','text','create_time','original_post')" + " VALUES (?,?,now(),?)";
+		String query = "INSERT INTO posts (user_id,text,original_post_id,create_time) " 
+					+ "VALUES (?,?,?,now())";
 		try {
 			st = connection.prepareStatement(query);
+			User user = post.getPoster();
+			System.out.println("User: " + user.getUserId());
 			st.setInt(1, post.getPoster().getUserId());
 			st.setString(2, post.getText());
 			if (post.getOriginalPost() == null) {
-				st.setString(4, null);
+				st.setString(3, null);
 			} else {
-				st.setInt(4, post.getOriginalPost().getPostId());
+				st.setInt(3, post.getOriginalPost().getPostId());
 			}
 
 			st.executeUpdate();
 
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 
 		} finally {

@@ -61,6 +61,10 @@ public class Post {
 		
 	}
 	
+	public void setPoster(User poster) {
+		this.poster = poster;
+	}
+
 	public void setPostId(int postId) {
 		this.postId = postId;
 	}

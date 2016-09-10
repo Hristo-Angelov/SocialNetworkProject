@@ -16,9 +16,7 @@ public class DBUtil {
 	
 	public static void closePreparedStatement(Statement ps) {
 		try {
-			System.out.println("Chekcing that PS isn't null");
 			if (ps != null) {
-				System.out.println("closing PS");
 				ps.close();
 			}
 		} catch (SQLException e) {

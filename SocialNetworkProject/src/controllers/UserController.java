@@ -52,7 +52,7 @@ public class UserController extends HttpServlet {
 				String passwordMessage = RegistrationValidation.validatePassword(password);
 
 				if (usernameMessage == null && emailMessage == null && passwordMessage == null) {
-					url = "/thanks.jsp";
+					url = "/newsfeed.jsp";
 					UserDAO userDao = UserDAOImpl.getInstance();
 					userDao.insertUser(user);
 					user = setUserToSession(session, user);

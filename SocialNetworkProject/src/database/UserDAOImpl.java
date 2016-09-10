@@ -35,7 +35,7 @@ public class UserDAOImpl implements UserDAO {
 		Connection connection = pool.getConnection();
 		PreparedStatement ps = null;
 
-		String query = "INSERT INTO users (username, email, password, registration_date, is_private)"
+		String query = "INSERT INTO users (username, email, password, registration_date, is_private) "
 				+ "VALUES (?, ?, ?, now(), false)";
 
 		try {
@@ -79,6 +79,7 @@ public class UserDAOImpl implements UserDAO {
 				user.setUserId(Integer.parseInt(rs.getString("user_id")));
 				user.setUsername(rs.getString("username"));
 				user.setEmail(rs.getString("email"));
+				user.setUserId(rs.getInt("user_id"));
 			}
 			return user;
 		} catch (SQLException e) {
