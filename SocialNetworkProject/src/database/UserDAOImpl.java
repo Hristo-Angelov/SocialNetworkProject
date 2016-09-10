@@ -36,14 +36,13 @@ public class UserDAOImpl implements UserDAO {
 		PreparedStatement ps = null;
 
 		String query = "INSERT INTO users (username, email, password, registration_date, is_private)"
-				+ "VALUES (?, ?, ?, ?, false)";
+				+ "VALUES (?, ?, ?, now(), false)";
 
 		try {
 			ps = connection.prepareStatement(query);
 			ps.setString(1, user.getUsername());
 			ps.setString(2, user.getEmail());
 			ps.setString(3, PasswordUtil.generatePasswordHash(user.getPassword()));
-			ps.setString(4, user.getJoinDate().toString());
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
