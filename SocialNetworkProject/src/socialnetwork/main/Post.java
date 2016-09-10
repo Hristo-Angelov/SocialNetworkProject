@@ -11,6 +11,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,9 +36,41 @@ public class Post {
 	private static int idCounter = 0;
 	private DataBase database;
 	private List<User> likes = new ArrayList<User>();
+	private Set<User> newLikes = new TreeSet<User>((u1,u2) -> u1.getUsername().compareTo(u2.getUsername()));
 	private List<Post> replies = new ArrayList<Post>();
+	private Set<Post> newReplies = new TreeSet<Post>((r1,r2) -> r1.getDateWhenPosted().compareTo(r2.getDateWhenPosted()));
+	public Set<User> getNewLikes() {
+		return newLikes;
+	}
+
+	public void setNewLikes(Set<User> newLikes) {
+		this.newLikes = newLikes;
+	}
+
+	public Set<Post> getNewReplies() {
+		return newReplies;
+	}
+
+	public void setNewReplies(Set<Post> newReplies) {
+		this.newReplies = newReplies;
+	}
+
+	public Set<Post> getNewRetweets() {
+		return newRetweets;
+	}
+
+	public void setNewRetweets(Set<Post> newRetweets) {
+		this.newRetweets = newRetweets;
+	}
+
 	private List<Post> retweets = new ArrayList<Post>();
+	private Set<Post> newRetweets = new TreeSet<Post>((r1,r2) -> r1.getDateWhenPosted().compareTo(r2.getDateWhenPosted()));
 	private List<Hashtag> hashtags = new ArrayList<Hashtag>();
+	
+
+	public void setLikes(List<User> likes) {
+		this.likes = likes;
+	}
 
 	public Post(String text, User poster, DataBase database) throws InvalidInputException {
 		if (Validator.isValidString(text, MIN_POST_LENGTH, MAX_POST_LENGTH))
