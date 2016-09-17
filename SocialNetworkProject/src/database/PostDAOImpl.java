@@ -43,6 +43,11 @@ public class PostDAOImpl implements PostDAO {
 
 	public void addLike(Post post, User user) {
 		Connection conn = pool.getConnection();
+		this.addLike(post, user, conn);
+	}
+
+	public void addLike(Post post, User user, Connection conn) {
+
 		String insertLikeSql = "INSERT INTO likes VALUES (?,?)";
 
 		try (PreparedStatement statement = conn.prepareStatement(insertLikeSql);) {
@@ -59,13 +64,20 @@ public class PostDAOImpl implements PostDAO {
 	@Override
 	public void insertPost(Post post) {
 		Connection connection = pool.getConnection();
+		this.insertPost(post, connection);
+
+	}
+
+	public void insertPost(Post post, Connection connection) {
+
 		PreparedStatement st = null;
 		try {
-			this.findHashtags(post.getText(), post);
+			this.findHashtags(post.getText(), post, connection);
 		} catch (InvalidInputException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+
 		String query = "INSERT INTO posts (user_id,text,original_post_id, post_type ,create_time) "
 				+ "VALUES (?,?,?,?,now())";
 		try {
@@ -92,16 +104,19 @@ public class PostDAOImpl implements PostDAO {
 		}
 
 	}
-	
 
 	@Override
 	public Post selectPost(int postId) {
+		Connection connection = pool.getConnection();
+		Post post = this.selectPost(postId, connection);
+		return post;
+	}
+
+	public Post selectPost(int postId, Connection connection) {
 		Post post = null;
 
 		int originalPostId = -1;
 		int postType = -1;
-
-		Connection connection = pool.getConnection();
 
 		String query = "SELECT * FROM posts " + "WHERE post_id = " + postId;
 
@@ -139,8 +154,13 @@ public class PostDAOImpl implements PostDAO {
 	}
 
 	public Set<Retweet> getRetweets(Post post) {
-		Set<Post> retweets = new HashSet<Post>();
 		Connection connection = pool.getConnection();
+		Set<Retweet> retweets = this.getRetweets(post);
+		return retweets;
+	}
+
+	public Set<Retweet> getRetweets(Post post, Connection connection) {
+		Set<Post> retweets = new HashSet<Post>();
 		String retweetQuery = "SELECT a.* FROM posts p" + "JOIN posts a ON p.post_id = a.original_post_id"
 				+ "WHERE a.post_type = 2;";
 		try (PreparedStatement ps = connection.prepareStatement(retweetQuery); ResultSet rs = ps.executeQuery();) {
@@ -164,8 +184,12 @@ public class PostDAOImpl implements PostDAO {
 	}
 
 	public Set<Post> getReplies(Post post) {
-		Set<Post> answers = new HashSet<Post>();
 		Connection connection = pool.getConnection();
+		return this.getReplies(post, connection);
+	}
+
+	public Set<Post> getReplies(Post post, Connection connection) {
+		Set<Post> answers = new HashSet<Post>();
 
 		String answerQuery = "SELECT a.* FROM posts p" + "JOIN posts a ON p.post_id = a.original_post_id"
 				+ "WHERE a.post_type = 1;";
@@ -190,9 +214,13 @@ public class PostDAOImpl implements PostDAO {
 
 	@Override
 	public List<Post> getUserPosts(User user) {
+		Connection conn = pool.getConnection();
+		return this.getUserPosts(user, conn);
+	}
+
+	public List<Post> getUserPosts(User user, Connection conn) {
 
 		List<Post> posts = new ArrayList<Post>();
-		Connection conn = pool.getConnection();
 
 		String query = "SELECT post_id FROM posts WHERE user_id = (?)";
 		try (PreparedStatement statement = conn.prepareStatement(query);) {
@@ -215,18 +243,19 @@ public class PostDAOImpl implements PostDAO {
 		return null;
 	}
 
-	private void findHashtags(String text, Post post) throws InvalidInputException {
+	private void findHashtags(String text, Post post, Connection connection) throws InvalidInputException {
 		Matcher matcher = HASHTAG_REGEX.matcher(text);
 		while (matcher.find()) {
 			Hashtag hashtag = new Hashtag(matcher.group(0));
 
-			try (Connection conn = pool.getConnection()) {
-				PreparedStatement statement = conn.prepareStatement("INSERT INTO hashtags (text, count ) values (?,?)",
-						Statement.RETURN_GENERATED_KEYS);
+			try {
+
+				PreparedStatement statement = connection.prepareStatement(
+						"INSERT INTO hashtags (text, count ) values (?,?)", Statement.RETURN_GENERATED_KEYS);
 				statement.setString(1, matcher.group(0));
 				statement.setInt(2, START_COUNT_VALUE);
 				statement.executeUpdate();
-				this.mapHashtagsToPost(hashtag, post);
+				this.mapHashtagsToPost(hashtag, post, connection);
 				ResultSet rs = statement.getGeneratedKeys();
 				rs.next();
 				int hashtagId = rs.getInt(1);
@@ -242,12 +271,12 @@ public class PostDAOImpl implements PostDAO {
 
 	}
 
-	private void mapHashtagsToPost(Hashtag hashtag, Post post) {
-		Connection conn = pool.getConnection();
+	private void mapHashtagsToPost(Hashtag hashtag, Post post, Connection connection) {
+
 		try {
 
 			String sql = "INSERT INTO hashtags_in_post VALUES (?, ?)";
-			PreparedStatement statement = conn.prepareStatement(sql);
+			PreparedStatement statement = connection.prepareStatement(sql);
 			statement.setInt(1, hashtag.getHashtagId());
 			statement.setInt(2, post.getPostId());
 			statement.executeUpdate();
@@ -260,9 +289,13 @@ public class PostDAOImpl implements PostDAO {
 
 	@Override
 	public Set<Post> getNewsfeed(User user) {
+		Connection connection = pool.getConnection();
+		return this.getNewsfeed(user, connection);
+	}
+
+	public Set<Post> getNewsfeed(User user, Connection connection) {
 		Set<Post> newsFeed = new TreeSet<Post>((p1, p2) -> p1.getDateWhenPosted().compareTo(p2.getDateWhenPosted()));
 
-		Connection connection = pool.getConnection();
 		String followersQuery = "SELECT p.post_id FROM users u "
 				+ "LEFT OUTER JOIN followers f ON (f.subject_id = u.user_id) "
 				+ "JOIN posts p ON (p.user_id = f.follower_id) " + "WHERE u.user_id = " + user.getUserId();
@@ -285,8 +318,12 @@ public class PostDAOImpl implements PostDAO {
 
 	@Override
 	public TreeSet<User> getLikes(Post post) {
-
 		Connection connection = pool.getConnection();
+		return this.getLikes(post, connection);
+	}
+
+	public TreeSet<User> getLikes(Post post, Connection connection) {
+
 		TreeSet<User> likes = new TreeSet<User>();
 		String queryLikes = "SELECT u.* FROM posts p " + "join likes l on(p.post_id = l.post)"
 				+ "join users u on(l.user_number = u.user_id)" + "where p.post_id = " + post.getPostId();
