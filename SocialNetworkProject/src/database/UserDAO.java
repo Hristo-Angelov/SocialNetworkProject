@@ -1,5 +1,7 @@
 package database;
 
+import java.sql.Connection;
+
 import socialnetwork.main.User;
 
 public interface UserDAO {
@@ -17,4 +19,6 @@ public interface UserDAO {
 	public void removeUser(User user);
 	
 	public String getUserPasswordHash(String username);
+
+	public void insertUser(User user, Connection connection);
 }

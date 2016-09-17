@@ -43,15 +43,15 @@ public class Demo {
 			System.out.println();
 			
 			// 4. Posts
-			Post jimPost1 = new Post("First tweet! #firstTweet2016 #greatConsoleDemo #greatConsoleDemo", jim, database);
+			Post jimPost1 = new Post("First tweet! #firstTweet2016 #greatConsoleDemo #greatConsoleDemo", jim);
 			jim.addPost(jimPost1);
 			john.likePost(jimPost1);
 			james.likePost(jimPost1);
-			Post jamesPost1 = new Post("@Jim Congrats! #greatPost #greatConsoleDemo", james, database);
+			Post jamesPost1 = new Post("@Jim Congrats! #greatPost #greatConsoleDemo", james);
 			james.reply(jimPost1, jamesPost1);
 			System.out.println(jim.getMyPosts().get(0));
 			System.out.println(jamesPost1);
-			Post newPost = new Post("Az sym nov post", jim, database);
+			Post newPost = new Post("Az sym nov post", jim);
 			jim.addPost(newPost);
 			
 			
@@ -65,7 +65,7 @@ public class Demo {
 			System.out.println(database.getTrendingHashtags());
 			
 			// 7.Retweeting posts
-			jim.retweet(jamesPost1, new Post("Eto retweetnah tozi post", jim, database));
+			jim.retweet(jamesPost1, new Post("Eto retweetnah tozi post", jim));
 			System.out.println("Jim's posts: ");
 			System.out.println(jim.getMyPosts().get(jim.getMyPosts().size()-1));
 			System.out.println(jim.getMyPosts().get(0));

@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import database.PostDAOImpl;
 import database.UserDAO;
 import database.UserDAOImpl;
+import exceptions.InvalidInputException;
 import socialnetwork.main.Post;
 import socialnetwork.main.User;
 
@@ -84,7 +85,12 @@ public class UserController extends HttpServlet {
 						user = setUserToSession(session, user);
 //						Set<Post> feed = PostDAOImpl.getInstance().getNewsfeed(user);
 						Set<Post> feed = new TreeSet<Post>();
-						feed.add(PostDAOImpl.getInstance().selectPost(1));
+						try {
+							feed.add(new Post("hi", user));
+						} catch (InvalidInputException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						request.setAttribute("feed", feed);
 					} else {
 						url = "/login.jsp";

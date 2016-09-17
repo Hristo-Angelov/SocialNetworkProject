@@ -72,19 +72,13 @@ public class Post implements Comparable<Post>{
 		this.likes = likes;
 	}
 
-	public Post(String text, User poster, DataBase database) throws InvalidInputException {
+	public Post(String text, User poster) throws InvalidInputException {
 		if (Validator.isValidString(text, MIN_POST_LENGTH, MAX_POST_LENGTH))
 			this.text = text;
 		if (poster != null) {
 			this.poster = poster;
 		} else {
 			throw new InvalidInputException("Not valid poster");
-		}
-		if (Validator.isValidObject(database)) {
-			this.database = database;
-
-		} else {
-			throw new InvalidInputException("Invalid database");
 		}
 		this.dateWhenPosted = LocalDateTime.now();
 		this.findHashtags(text);
@@ -335,8 +329,6 @@ public class Post implements Comparable<Post>{
 			}
 
 		}
-		database.addHashtags(this);
-
 	}
 
 	public List<Hashtag> getHashtags() {

@@ -7,7 +7,7 @@ public class Retweet extends Post {
 	private Post question;
 
 	public Retweet(String text, User poster, Post originalPost, DataBase database) throws InvalidInputException {
-		super(text, poster, database);
+		super(text, poster);
 		if (Validator.isValidObject(originalPost)) {
 			this.question = originalPost;
 		} else {

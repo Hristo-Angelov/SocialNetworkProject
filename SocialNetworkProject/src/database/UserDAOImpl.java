@@ -23,6 +23,10 @@ public class UserDAOImpl implements UserDAO {
 
 	public boolean isUsernameAvailable(String username) {
 		Connection connection = pool.getConnection();
+		return isUsernameAvailable(username, connection);
+	}
+	
+	public boolean isUsernameAvailable(String username, Connection connection) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		
@@ -45,6 +49,10 @@ public class UserDAOImpl implements UserDAO {
 
 	public boolean isEmailAvailable(String email) {
 		Connection connection = pool.getConnection();
+		return isEmailAvailable(email, connection);
+	}
+	
+	public boolean isEmailAvailable(String email, Connection connection) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		
@@ -67,6 +75,10 @@ public class UserDAOImpl implements UserDAO {
 
 	public void insertUser(User user) {
 		Connection connection = pool.getConnection();
+		insertUser(user, connection);
+	}
+
+	public void insertUser(User user, Connection connection) {
 		PreparedStatement ps = null;
 		System.out.println("inserting user: " + user.getUsername());
 		String query = "INSERT INTO users (username, email, password, registration_date, is_private) "
@@ -85,7 +97,7 @@ public class UserDAOImpl implements UserDAO {
 			pool.freeConnection(connection);
 		}
 	}
-
+	
 	public void updateUser(User user) {
 		// TODO
 	}
@@ -97,6 +109,10 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public User selectUser(String username) {
 		Connection connection = pool.getConnection();
+		return selectUser(username, connection);
+	}
+
+	public User selectUser(String username, Connection connection) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
@@ -125,10 +141,15 @@ public class UserDAOImpl implements UserDAO {
 			pool.freeConnection(connection);
 		}
 	}
-
+	
 	@Override
 	public String getUserPasswordHash(String username) {
 		String pass = selectUser(username).getPassword().trim();
+		return pass;
+	}
+	
+	public String getUserPasswordHash(String username, Connection connection) {
+		String pass = selectUser(username, connection).getPassword().trim();
 		return pass;
 	}
 

@@ -8,7 +8,7 @@ public interface PostDAO {
 
 	public void insertPost(Post post);
 
-	public Post selectPost(int podtId);
+	public Post selectPost(int postId);
 	
 	public List<Post> getUserPosts(User user);
 
