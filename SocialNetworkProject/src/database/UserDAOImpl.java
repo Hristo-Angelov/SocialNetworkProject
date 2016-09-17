@@ -143,6 +143,42 @@ public class UserDAOImpl implements UserDAO {
 	}
 	
 	@Override
+	public User selectUser(int userID) {
+		Connection connection = pool.getConnection();
+		return selectUser(userID, connection);
+	}
+
+	public User selectUser(int userID, Connection connection) {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		String query = "SELECT * FROM users " 
+					+ "WHERE user_id = ?";
+
+		try {
+			ps = connection.prepareStatement(query);
+			ps.setInt(1, userID);
+			rs = ps.executeQuery();
+			User user = null;
+			if (rs.next()) {
+				user = new User();
+				user.setUserId(Integer.parseInt(rs.getString("user_id")));
+				user.setUsername(rs.getString("username"));
+				user.setEmail(rs.getString("email"));
+				user.setUserId(rs.getInt("user_id"));
+				user.setPassword(rs.getString("password"));
+			}
+			return user;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			DBUtil.closePreparedStatement(ps);
+			pool.freeConnection(connection);
+		}
+	}
+	
+	@Override
 	public String getUserPasswordHash(String username) {
 		String pass = selectUser(username).getPassword().trim();
 		return pass;

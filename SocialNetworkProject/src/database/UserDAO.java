@@ -21,4 +21,6 @@ public interface UserDAO {
 	public String getUserPasswordHash(String username);
 
 	public void insertUser(User user, Connection connection);
+
+	public User selectUser(int userID);
 }
