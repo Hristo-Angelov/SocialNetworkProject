@@ -16,5 +16,6 @@ public class TestPostDAOModule {
 		assertNotNull(p.getText());
 		
 		System.out.println(p.getDateWhenPosted());
+		System.out.println(p.getText());
 	}
 }

@@ -126,19 +126,18 @@ public class PostDAOImpl implements PostDAO {
 		try (Statement st = connection.createStatement(); ResultSet rs = st.executeQuery(query);) {
 
 			post = new Post();
-			while (rs.next()) {
-				postType = rs.getInt("post_type");
-				originalPostId = rs.getInt("original_post_id");
-				post.setDateWhenPosted(rs.getTimestamp("create_time").toLocalDateTime());
-				post.setPostId(postId);
-				post.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id"), connection));
-				post.setText(rs.getString("text"));
-				post.setPostType(PostType.fromInt(postType));
-				if (postType != 0) {
-					post.setOriginalPost(selectPost(originalPostId, connection));
-				}
-
+			rs.next();
+			postType = rs.getInt("post_type");
+			originalPostId = rs.getInt("original_post_id");
+			post.setDateWhenPosted(rs.getTimestamp("create_time").toLocalDateTime());
+			post.setPostId(postId);
+			post.setText(rs.getString("text"));
+			post.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id"), DBTestConnection.getInstance().getConnection()));
+			post.setPostType(PostType.fromInt(postType));
+			if (postType != 0) {
+				post.setOriginalPost(selectPost(originalPostId, connection));
 			}
+
 		} catch (SQLException e) {
 
 			e.printStackTrace();
