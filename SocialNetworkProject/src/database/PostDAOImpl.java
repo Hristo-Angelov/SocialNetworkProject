@@ -13,9 +13,12 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.mysql.jdbc.Util;
+
 import exceptions.InvalidInputException;
 import socialnetwork.main.Hashtag;
 import socialnetwork.main.Post;
+import socialnetwork.main.Retweet;
 import socialnetwork.main.User;
 
 public class PostDAOImpl implements PostDAO {
@@ -89,13 +92,12 @@ public class PostDAOImpl implements PostDAO {
 		}
 
 	}
+	
 
 	@Override
 	public Post selectPost(int postId) {
 		Post post = null;
-		Set<User> likes = new HashSet<User>();
-		Set<Post> answers = new HashSet<Post>();
-		Set<Post> retweets = new HashSet<Post>();
+
 		int originalPostId = -1;
 		int postType = -1;
 
@@ -118,7 +120,7 @@ public class PostDAOImpl implements PostDAO {
 						Post originalPost = new Post();
 						originalPost.setDateWhenPosted(rs.getTimestamp("create_time").toLocalDateTime());
 						originalPost.setText(rs.getString("text"));
-						// originalPost.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id")));
+						originalPost.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id")));
 
 					}
 				}
@@ -127,28 +129,44 @@ public class PostDAOImpl implements PostDAO {
 		} catch (SQLException e) {
 
 			e.printStackTrace();
+
+		} finally {
+			pool.freeConnection(connection);
+
 		}
-		String queryLikes = "SELECT * FROM posts p " + "join likes l on(p.post_id = l.post)"
-				+ "join users u on(l.user_number = u.user_id)" + "where p.post_id = " + post.getPostId();
-		try (PreparedStatement likesStatement = connection.prepareStatement(queryLikes);
-				ResultSet rs = likesStatement.executeQuery();) {
+
+		return post;
+	}
+
+	public Set<Retweet> getRetweets(Post post) {
+		Set<Post> retweets = new HashSet<Post>();
+		Connection connection = pool.getConnection();
+		String retweetQuery = "SELECT a.* FROM posts p" + "JOIN posts a ON p.post_id = a.original_post_id"
+				+ "WHERE a.post_type = 2;";
+		try (PreparedStatement ps = connection.prepareStatement(retweetQuery); ResultSet rs = ps.executeQuery();) {
 
 			while (rs.next()) {
-				User user = new User();
-
-				user.setEmail(rs.getString("email"));
-				user.setPassword(rs.getString("password"));
-				user.setUserId(rs.getInt("user_id"));
-				user.setUsername(rs.getString("username"));
-
-				likes.add(user);
+				Post newPost = new Post();
+				newPost.setText(rs.getString("text"));
+				newPost.setDateWhenPosted(rs.getTimestamp("create_time").toLocalDateTime());
+				// newPost.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id")));
+				retweets.add(newPost);
 			}
-			post.setNewLikes(likes);
 
 		} catch (SQLException e) {
 
 			e.printStackTrace();
+		} finally {
+			pool.freeConnection(connection);
+
 		}
+		return null;
+	}
+
+	public Set<Post> getReplies(Post post) {
+		Set<Post> answers = new HashSet<Post>();
+		Connection connection = pool.getConnection();
+
 		String answerQuery = "SELECT a.* FROM posts p" + "JOIN posts a ON p.post_id = a.original_post_id"
 				+ "WHERE a.post_type = 1;";
 		try (PreparedStatement ps = connection.prepareStatement(answerQuery);
@@ -167,57 +185,32 @@ public class PostDAOImpl implements PostDAO {
 
 			e.printStackTrace();
 		}
-		String retweetQuery = "SELECT a.* FROM posts p" + "JOIN posts a ON p.post_id = a.original_post_id"
-				+ "WHERE a.post_type = 2;";
-		try (PreparedStatement ps = connection.prepareStatement(retweetQuery); ResultSet rs = ps.executeQuery();) {
-
-			while (rs.next()) {
-				Post newPost = new Post();
-				newPost.setText(rs.getString("text"));
-				newPost.setDateWhenPosted(rs.getTimestamp("create_time").toLocalDateTime());
-				// newPost.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id")));
-				retweets.add(newPost);
-			}
-			post.setNewRetweets(retweets);
-
-		} catch (SQLException e) {
-
-			e.printStackTrace();
-		} finally {
-			pool.freeConnection(connection);
-
-		}
-
-		return post;
+		return answers;
 	}
 
 	@Override
 	public List<Post> getUserPosts(User user) {
-		
+
 		List<Post> posts = new ArrayList<Post>();
 		Connection conn = pool.getConnection();
-		
+
 		String query = "SELECT post_id FROM posts WHERE user_id = (?)";
-		try(PreparedStatement statement = conn.prepareStatement(query);) {
+		try (PreparedStatement statement = conn.prepareStatement(query);) {
 			statement.setInt(1, user.getUserId());
-			
-			
+
 			ResultSet rs = statement.executeQuery();
-			while(rs.next()){
-			int postId = 	rs.getInt(1);
-			Post post = this.selectPost(postId);
-			posts.add(post);
-			
+			while (rs.next()) {
+				int postId = rs.getInt(1);
+				Post post = this.selectPost(postId);
+				posts.add(post);
+
 			}
 			return posts;
-			
-			
-			
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 
 		return null;
 	}
@@ -260,7 +253,7 @@ public class PostDAOImpl implements PostDAO {
 			statement.executeUpdate();
 
 		} catch (SQLException e) {
-			
+
 			e.printStackTrace();
 		}
 	}
@@ -271,9 +264,8 @@ public class PostDAOImpl implements PostDAO {
 
 		Connection connection = pool.getConnection();
 		String followersQuery = "SELECT p.post_id FROM users u "
-					+ "LEFT OUTER JOIN followers f ON (f.subject_id = u.user_id) "
-					+ "JOIN posts p ON (p.user_id = f.follower_id) "
-					+ "WHERE u.user_id = " + user.getUserId();
+				+ "LEFT OUTER JOIN followers f ON (f.subject_id = u.user_id) "
+				+ "JOIN posts p ON (p.user_id = f.follower_id) " + "WHERE u.user_id = " + user.getUserId();
 
 		try (PreparedStatement ps = connection.prepareStatement(followersQuery); ResultSet rs = ps.executeQuery();) {
 
@@ -296,7 +288,7 @@ public class PostDAOImpl implements PostDAO {
 
 		Connection connection = pool.getConnection();
 		TreeSet<User> likes = new TreeSet<User>();
-		String queryLikes = "SELECT * FROM posts p " + "join likes l on(p.post_id = l.post)"
+		String queryLikes = "SELECT u.* FROM posts p " + "join likes l on(p.post_id = l.post)"
 				+ "join users u on(l.user_number = u.user_id)" + "where p.post_id = " + post.getPostId();
 		try (PreparedStatement likesStatement = connection.prepareStatement(queryLikes);
 				ResultSet rs = likesStatement.executeQuery();) {
