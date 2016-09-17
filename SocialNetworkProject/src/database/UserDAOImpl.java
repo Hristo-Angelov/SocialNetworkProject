@@ -26,8 +26,8 @@ public class UserDAOImpl implements UserDAO {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		
-		String query = "SELECT username FROM users u "
-				+ "WHERE u.username = ?";
+		String query = "SELECT username FROM users "
+				+ "WHERE username = ?";
 		try {
 			ps = connection.prepareStatement(query);
 			ps.setString(1, username);
@@ -44,8 +44,25 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	public boolean isEmailAvailable(String email) {
-		// TODO Auto-generated method stub
-		return true;
+		Connection connection = pool.getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		
+		String query = "SELECT email FROM users "
+				+ "WHERE email = ?";
+		try {
+			ps = connection.prepareStatement(query);
+			ps.setString(1, email);
+			rs = ps.executeQuery();
+			return !rs.next();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			DBUtil.closeResultSet(rs);
+			DBUtil.closePreparedStatement(ps);
+			pool.freeConnection(connection);
+		}
 	}
 
 	public void insertUser(User user) {
