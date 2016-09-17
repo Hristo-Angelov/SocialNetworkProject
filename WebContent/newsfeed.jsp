@@ -12,9 +12,13 @@
 	<input type="submit" value="Tweet" class="margin_left">
 </form>
 
-<c:forEach var="feed" items="${post}">
+<c:forEach var="post" items="${feed}">
+<c:if test="${post == null}">
+    <p><i>No Post</i></p>
+	</c:if><br>
 	<tr>
 		<td><c:out value="${post.poster.username}" /></td>
+		<td><c:out value="${post.dateWhenPosted}" /></td>
 		<td><c:out value="${post.text}" /></td>
 	</tr>
 </c:forEach>
