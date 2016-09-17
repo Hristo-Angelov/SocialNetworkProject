@@ -3,7 +3,7 @@ package database;
 import java.util.List;
 
 import socialnetwork.main.Post;
-import socialnetwork.main.Post.Hashtag;
+import socialnetwork.main.Hashtag;
 
 public interface HashtagDAO {
 	

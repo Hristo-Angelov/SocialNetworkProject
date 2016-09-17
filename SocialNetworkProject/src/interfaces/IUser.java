@@ -6,9 +6,9 @@ import socialnetwork.main.User;
 
 public interface IUser {
 	
-	public void approveFollower(User follower) throws InvalidInputException;
-	void addPost(Post post) throws InvalidInputException;
-	void deletePost(Post post) throws InvalidInputException;
-	void reply(Post originalPost, Post myReply) throws InvalidInputException;
-	void retweet(Post originalPost, Post myReply) throws InvalidInputException;
+//	public void approveFollower(User follower) throws InvalidInputException;
+//	void addPost(Post post) throws InvalidInputException;
+//	void deletePost(Post post) throws InvalidInputException;
+//	void reply(Post originalPost, Post myReply) throws InvalidInputException;
+//	void retweet(Post originalPost, Post myReply) throws InvalidInputException;
 }

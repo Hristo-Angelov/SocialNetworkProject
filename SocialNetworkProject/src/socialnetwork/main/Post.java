@@ -34,7 +34,7 @@ public class Post implements Comparable<Post>{
 	private Post originalPost;
 	private PostType postType;
 	private static int idCounter = 0;
-	private DataBase database;
+
 	private List<User> likes = new ArrayList<User>();
 	private Set<User> newLikes = new TreeSet<User>((u1,u2) -> u1.getUsername().compareTo(u2.getUsername()));
 	private List<Post> replies = new ArrayList<Post>();
@@ -81,7 +81,7 @@ public class Post implements Comparable<Post>{
 			throw new InvalidInputException("Not valid poster");
 		}
 		this.dateWhenPosted = LocalDateTime.now();
-		this.findHashtags(text);
+//		this.findHashtags(text);
 		Post.idCounter++;
 		this.postId = Post.idCounter;
 	}
@@ -145,14 +145,7 @@ public class Post implements Comparable<Post>{
 
 		}
 
-		public void decreaseHashtagCount() throws InvalidInputException {
-			if (this.count > 1) {
-				this.count--;
-			} else {
-				Post.this.database.deleteHashTag(this);
-			}
-		}
-
+	
 		@Override
 		public int compareTo(Hashtag other) {
 			return this.count - other.count;
@@ -273,7 +266,7 @@ public class Post implements Comparable<Post>{
 
 	public Retweet retweet(Post originalPost) throws InvalidInputException {
 		if (Validator.isValidObject(originalPost)) {
-			Retweet newRetweet = new Retweet(this.text, this.poster, originalPost, database);
+			Retweet newRetweet = new Retweet(this.text, this.poster, originalPost);
 
 			originalPost.addRetweet(newRetweet);
 
@@ -308,28 +301,7 @@ public class Post implements Comparable<Post>{
 		likes.add(user);
 	}
 
-	private void findHashtags(String text) throws InvalidInputException {
-		Matcher matcher = Post.HASHTAG_REGEX.matcher(text);
-		while (matcher.find()) {
-			Hashtag hashtag = new Hashtag(matcher.group(0));
-			hashtags.add(hashtag);
-			try (Connection conn = DataBase.getConnection()) {
-				PreparedStatement statement = conn.prepareStatement("insert into hashtags (text, count ) values (?,?)");
-				statement.setString(1, matcher.group(0));
-				statement.setInt(2, START_COUNT_VALUE);
-				statement.executeUpdate();
-				Statement state = conn.createStatement();
-				ResultSet set = state
-						.executeQuery("select idhashtags from hastags where idhashtags = '" + matcher.group(0) + "'");
-				hashtag.setHashtagId(set.getInt(1));
-				set.close();
-			} catch (SQLException e) {
-
-				e.printStackTrace();
-			}
-
-		}
-	}
+	
 
 	public List<Hashtag> getHashtags() {
 		return Collections.unmodifiableList(this.hashtags);
@@ -343,16 +315,16 @@ public class Post implements Comparable<Post>{
 				+ this.retweets.size();
 	}
 
-	public void delete() throws InvalidInputException {
-		if (hashtags.size() > 0) {
-			for (Hashtag hashtag : hashtags) {
-				hashtag.decreaseHashtagCount();
-			}
-		} else {
-			System.out.println("No hashtags in this post.");
-		}
-
-	}
+//	public void delete() throws InvalidInputException {
+//		if (hashtags.size() > 0) {
+//			for (Hashtag hashtag : hashtags) {
+//				hashtag.decreaseHashtagCount();
+//			}
+//		} else {
+//			System.out.println("No hashtags in this post.");
+//		}
+//
+//	}
 
 	@Override
 	public int compareTo(Post o) {

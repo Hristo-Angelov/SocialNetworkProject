@@ -25,7 +25,7 @@ public class User implements IUser, Serializable {
 	private String email;
 	private final LocalDate joinDate;
 	private int idInDatabase;
-	private DataBase database; // unnecessary beyond console demo
+
 
 	// changeable user inforamtion
 	private File picture;
@@ -53,10 +53,7 @@ public class User implements IUser, Serializable {
 		this.email = email;
 	}
 
-	public User(String username, String password, String email, DataBase database) {
-		this(username, password, email);
-		this.database = database;
-	}
+
 
 	public void changePassword(String newPassword) {
 		this.password = newPassword;
@@ -120,54 +117,54 @@ public class User implements IUser, Serializable {
 	}
 
 
-	private int getUserDbId() {
-		int userId = 0;
+//	private int getUserDbId() {
+//		int userId = 0;
+//
+//		try (Connection connection = DataBase.getConnection();) {
+//
+//			Statement statement = connection.createStatement();
+//			ResultSet set = statement
+//					.executeQuery("select user_number from users where username = '" + this.getUsername() + "'");
+//
+//			if (set.first()) {
+//				userId = set.getInt(1);
+//			}
+//
+//		} catch (SQLException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return userId;
+//
+//	}
 
-		try (Connection connection = DataBase.getConnection();) {
-
-			Statement statement = connection.createStatement();
-			ResultSet set = statement
-					.executeQuery("select user_number from users where username = '" + this.getUsername() + "'");
-
-			if (set.first()) {
-				userId = set.getInt(1);
-			}
-
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return userId;
-
-	}
-
-
-	public void addPost(Post post) throws InvalidInputException {
-		if (Validator.isValidObject(post)) {
-			this.myPosts.add(post);
-			try(Connection con = DataBase.getConnection()) {
-				
-				
-				PreparedStatement statement = con.prepareStatement("insert into posts (idpost,create_time, text,user_number)values(?,?,?,?)");
-	
-				statement.setInt(1, post.getPostId());
-				statement.setString(2, post.getDateWhenPosted().toString());
-				statement.setString(3, post.getText());
-				statement.setInt(4, this.getUserDbId());
-				int rows = statement.executeUpdate();
-				System.out.println("posts entered" + rows);
-				
-
-				// statement = DataBase.generatePreparedStatement(query);
-
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		} else {
-
-			throw new InvalidInputException("Error! Can't post a non-existant post.");
-		}
-	}
+//
+//	public void addPost(Post post) throws InvalidInputException {
+//		if (Validator.isValidObject(post)) {
+//			this.myPosts.add(post);
+//			try(Connection con = DataBase.getConnection()) {
+//				
+//				
+//				PreparedStatement statement = con.prepareStatement("insert into posts (idpost,create_time, text,user_number)values(?,?,?,?)");
+//	
+//				statement.setInt(1, post.getPostId());
+//				statement.setString(2, post.getDateWhenPosted().toString());
+//				statement.setString(3, post.getText());
+//				statement.setInt(4, this.getUserDbId());
+//				int rows = statement.executeUpdate();
+//				System.out.println("posts entered" + rows);
+//				
+//
+//				// statement = DataBase.generatePreparedStatement(query);
+//
+//			} catch (SQLException e) {
+//				e.printStackTrace();
+//			}
+//		} else {
+//
+//			throw new InvalidInputException("Error! Can't post a non-existant post.");
+//		}
+//	}
 
 	public boolean isPrivate() {
 		return isPrivate;
@@ -282,59 +279,57 @@ public class User implements IUser, Serializable {
 		this.followedUsers.remove(followed);
 	}
 
-	@Override
-	public void deletePost(Post post) throws InvalidInputException {
-		try {
-			if (Validator.isValidObject(post)) {
-				if (this.myPosts.remove(post)) {
+//	@Override
+//	public void deletePost(Post post) throws InvalidInputException {
+//		try {
+//			if (Validator.isValidObject(post)) {
+//				if (this.myPosts.remove(post)) {
+//
+//					post.delete();
+//				}
+//			}
+//		} catch (InvalidInputException e) {
+//			throw new InvalidInputException("This post no longer exists.", e);
+//		}
+//	}
 
-					post.delete();
-				}
-			}
-		} catch (InvalidInputException e) {
-			throw new InvalidInputException("This post no longer exists.", e);
-		}
-	}
+//	@Override
+//	public void reply(Post originalPost, Post myReply) throws InvalidInputException {
+//		try {
+//			if (Validator.isValidObject(originalPost)) {
+//				myReply.reply(originalPost);
+//			}
+//		} catch (Exception e) {
+//			throw new InvalidInputException("Cannot retweet a non-existent post.", e);
+//		}
+//		addPost(myReply);
+//	}
 
-	@Override
-	public void reply(Post originalPost, Post myReply) throws InvalidInputException {
-		try {
-			if (Validator.isValidObject(originalPost)) {
-				myReply.reply(originalPost);
-			}
-		} catch (Exception e) {
-			throw new InvalidInputException("Cannot retweet a non-existent post.", e);
-		}
-		addPost(myReply);
-	}
+//	@Override
+//	public void retweet(Post originalPost, Post myRetweet) throws InvalidInputException {
+//		try {
+//			if (Validator.isValidObject(originalPost)) {
+//				Retweet retweet = myRetweet.retweet(originalPost);
+//				addPost(retweet);
+//				try(Connection con = DataBase.getConnection()){
+//					Statement statement = con.createStatement();
+//					statement.executeUpdate("update posts set question_post  = '" + originalPost.getPostId() +"' where idpost = '" + retweet.getPostId()+"'");
+//					PreparedStatement prepStatement = con.prepareStatement("insert into retweets (idretweet,text)values(?,?)");
+//					prepStatement.setInt(1,retweet.getPostId());
+//					prepStatement.setString(2, retweet.getText());
+//					prepStatement.executeUpdate();
+//				}catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		} catch (Exception e) {
+//			throw new InvalidInputException("Cannot retweet a non-existent post.", e);
+//		}
+//		// addPost(myRetweet);
+//
+//	}
 
-	@Override
-	public void retweet(Post originalPost, Post myRetweet) throws InvalidInputException {
-		try {
-			if (Validator.isValidObject(originalPost)) {
-				Retweet retweet = myRetweet.retweet(originalPost);
-				addPost(retweet);
-				try(Connection con = DataBase.getConnection()){
-					Statement statement = con.createStatement();
-					statement.executeUpdate("update posts set question_post  = '" + originalPost.getPostId() +"' where idpost = '" + retweet.getPostId()+"'");
-					PreparedStatement prepStatement = con.prepareStatement("insert into retweets (idretweet,text)values(?,?)");
-					prepStatement.setInt(1,retweet.getPostId());
-					prepStatement.setString(2, retweet.getText());
-					prepStatement.executeUpdate();
-				}catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		} catch (Exception e) {
-			throw new InvalidInputException("Cannot retweet a non-existent post.", e);
-		}
-		// addPost(myRetweet);
-
-	}
-
-	public DataBase getDatabase() {
-		return this.database;
-	}
+	
 
 	@Override
 	public String toString() {
