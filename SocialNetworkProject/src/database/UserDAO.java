@@ -23,4 +23,6 @@ public interface UserDAO {
 	public void insertUser(User user, Connection connection);
 
 	public User selectUser(int userID);
+
+	public User selectUser(int int1, Connection connection);
 }

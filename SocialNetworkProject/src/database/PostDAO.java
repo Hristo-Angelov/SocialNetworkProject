@@ -1,5 +1,6 @@
 package database;
 
+import java.sql.Connection;
 import java.util.*;
 
 import socialnetwork.main.*;
@@ -15,6 +16,8 @@ public interface PostDAO {
 	public Set<Post> getNewsfeed(User user);
 	
 	public TreeSet<User> getLikes(Post post);
+
+	Post selectPost(int postId, Connection connection);
 	
 
  

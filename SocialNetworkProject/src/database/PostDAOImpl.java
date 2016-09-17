@@ -16,8 +16,10 @@ import java.util.regex.Pattern;
 import com.mysql.jdbc.Util;
 
 import exceptions.InvalidInputException;
+import junit.framework.Assert;
 import socialnetwork.main.Hashtag;
 import socialnetwork.main.Post;
+import socialnetwork.main.PostType;
 import socialnetwork.main.Retweet;
 import socialnetwork.main.User;
 
@@ -112,6 +114,7 @@ public class PostDAOImpl implements PostDAO {
 		return post;
 	}
 
+	@Override
 	public Post selectPost(int postId, Connection connection) {
 		Post post = null;
 
@@ -120,24 +123,19 @@ public class PostDAOImpl implements PostDAO {
 
 		String query = "SELECT * FROM posts " + "WHERE post_id = " + postId;
 
-		try (Statement st = connection.createStatement(); ResultSet set = st.executeQuery(query);) {
+		try (Statement st = connection.createStatement(); ResultSet rs = st.executeQuery(query);) {
 
 			post = new Post();
-			while (set.next()) {
-				postType = set.getInt("post_type");
-				originalPostId = set.getInt("original_post_id");
-
+			while (rs.next()) {
+				postType = rs.getInt("post_type");
+				originalPostId = rs.getInt("original_post_id");
+				post.setDateWhenPosted(rs.getTimestamp("create_time").toLocalDateTime());
+				post.setPostId(postId);
+				post.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id"), connection));
+				post.setText(rs.getString("text"));
+				post.setPostType(PostType.fromInt(postType));
 				if (postType != 0) {
-					PreparedStatement ps = connection
-							.prepareStatement("SELECT * FROM posts WHERE original_post_id = " + originalPostId);
-					ResultSet rs = ps.executeQuery();
-					while (true) {
-						Post originalPost = new Post();
-						originalPost.setDateWhenPosted(rs.getTimestamp("create_time").toLocalDateTime());
-						originalPost.setText(rs.getString("text"));
-						originalPost.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id")));
-
-					}
+					post.setOriginalPost(selectPost(originalPostId, connection));
 				}
 
 			}
