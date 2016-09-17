@@ -2,6 +2,7 @@
     <wb-module deploy-name="SocialNetworkProject">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/SocialNetworkProject/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/java"/>
         <property name="context-root" value="SocialNetworkProject"/>
         <property name="java-output-path" value="/SocialNetworkProject/SocialNetworkProject/bin"/>
     </wb-module>
