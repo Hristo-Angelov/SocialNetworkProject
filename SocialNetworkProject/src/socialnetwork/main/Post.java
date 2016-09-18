@@ -38,7 +38,7 @@ public class Post implements Comparable<Post>{
 	private List<User> likes = new ArrayList<User>();
 	private Set<User> newLikes = new TreeSet<User>((u1,u2) -> u1.getUsername().compareTo(u2.getUsername()));
 	private List<Post> replies = new ArrayList<Post>();
-	private Set<Post> newReplies = new TreeSet<Post>((r1,r2) -> r1.getDateWhenPosted().compareTo(r2.getDateWhenPosted()));
+	private Set<Post> newReplies = new TreeSet<Post>((r1,r2) -> r2.getDateWhenPosted().compareTo(r1.getDateWhenPosted()));
 	public Set<User> getNewLikes() {
 		return newLikes;
 	}
@@ -330,7 +330,7 @@ public class Post implements Comparable<Post>{
 
 	@Override
 	public int compareTo(Post o) {
-		return this.getDateWhenPosted().compareTo(o.getDateWhenPosted());
+		return o.getDateWhenPosted().compareTo(this.getDateWhenPosted());
 	}
 
 }

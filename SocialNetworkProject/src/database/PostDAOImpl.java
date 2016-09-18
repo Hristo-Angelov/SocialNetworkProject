@@ -215,6 +215,7 @@ public class PostDAOImpl implements PostDAO {
 		return this.getUserPosts(user, conn);
 	}
 
+	@Override
 	public List<Post> getUserPosts(User user, Connection conn) {
 
 		List<Post> posts = new ArrayList<Post>();
@@ -240,41 +241,84 @@ public class PostDAOImpl implements PostDAO {
 		return null;
 	}
 
-	private void findHashtags(String text, Post post, Connection connection) throws InvalidInputException {
+	@Override
+	public void findHashtags(String text, Post post, Connection connection) throws InvalidInputException {
+		try {
+			connection.setAutoCommit(false);
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		List<Hashtag> hashtags = new ArrayList<Hashtag>();
 		Matcher matcher = HASHTAG_REGEX.matcher(text);
+
 		while (matcher.find()) {
 			Hashtag hashtag = new Hashtag(matcher.group(0));
+			String sqlSelect = "SELECT * FROM hashtags WHERE hashtag_text LIKE '" + hashtag.getName() + "';";
+			ResultSet rs = null;
+			try (PreparedStatement statement = connection.prepareStatement(sqlSelect);) {
 
-			try {
+				
+				rs = statement.executeQuery(sqlSelect);
+				
+				
+				
+				if (rs.next()) {
+					int count = rs.getInt("count");
+					count++;
+					String increaseCountSql = "UPDATE  hashtags SET count = (?)  WHERE hashtag_text LIKE (?) ";
 
-				PreparedStatement statement = connection.prepareStatement(
-						"INSERT INTO hashtags (text, count ) values (?,?)", Statement.RETURN_GENERATED_KEYS);
-				statement.setString(1, matcher.group(0));
-				statement.setInt(2, START_COUNT_VALUE);
-				statement.executeUpdate();
-				this.mapHashtagsToPost(hashtag, post, connection);
-				ResultSet rs = statement.getGeneratedKeys();
-				rs.next();
-				int hashtagId = rs.getInt(1);
-				hashtag.setHashtagId(hashtagId);
+					PreparedStatement ps1 = connection.prepareStatement(increaseCountSql);
+					ps1.setInt(1, count);
+					ps1.setString(2, hashtag.getName());
+					ps1.executeUpdate();
+				} else {
 
-				rs.close();
+					PreparedStatement insertStatement = connection.prepareStatement(
+							"INSERT INTO hashtags (hashtag_text, count ) values (?,?)",
+							Statement.RETURN_GENERATED_KEYS);
+					insertStatement.setString(1, matcher.group(0));
+					insertStatement.setInt(2, START_COUNT_VALUE);
+
+					insertStatement.executeUpdate();
+					hashtags.add(hashtag);
+				
+				}
+
 			} catch (SQLException e) {
 
 				e.printStackTrace();
+			}finally{
+				DBUtil.closeResultSet(rs);
 			}
 
 		}
 
+		for (Hashtag hashtag : hashtags) {
+			this.mapHashtagsToPost(hashtag, post, connection);
+		}
+		try {
+			connection.commit();
+		} catch (SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			e.printStackTrace();
+		}
+
 	}
 
-	private void mapHashtagsToPost(Hashtag hashtag, Post post, Connection connection) {
+	@Override
+	public void mapHashtagsToPost(Hashtag hashtag, Post post, Connection connection) {
 
 		try {
 
-			String sql = "INSERT INTO hashtags_in_post VALUES (?, ?)";
+			String sql = "INSERT INTO hashtags_in_posts VALUES (?, ?)";
 			PreparedStatement statement = connection.prepareStatement(sql);
-			statement.setInt(1, hashtag.getHashtagId());
+			statement.setString(1, hashtag.getName());
 			statement.setInt(2, post.getPostId());
 			statement.executeUpdate();
 
@@ -347,24 +391,52 @@ public class PostDAOImpl implements PostDAO {
 		}
 		return likes;
 	}
-	public void deletePost(Post post){
+
+	public void deletePost(Post post) {
 		Connection connection = pool.getConnection();
 		this.deletePost(post, connection);
 	}
-	
-	
-	
-	public void deletePost(Post post, Connection connection){
-		String sql = "DELETE FROM posts WHERE post_id = (?);";
-		try(PreparedStatement statement = connection.prepareStatement(sql);) {
+
+	@Override
+	public void deletePost(Post post, Connection connection) {
+
+		String deleteFromLikesSql = "DELETE FROM likes where post_id  =  (?)";
+
+		PreparedStatement statement = null;
+		try {
+			statement = connection.prepareStatement(deleteFromLikesSql);
 			statement.setInt(1, post.getPostId());
 			statement.executeUpdate();
-			
+
+		} catch (SQLException e1) {
+
+			e1.printStackTrace();
+		}
+
+		if (post.getPostType().ordinal() >= 1) {
+
+		}
+
+		String sql = "DELETE FROM posts WHERE post_id = (?);";
+
+		try {
+			statement = connection.prepareStatement(sql);
+			connection.setAutoCommit(false);
+
+			statement.setInt(1, post.getPostId());
+			statement.executeUpdate();
+			connection.commit();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			try {
+				connection.rollback();
+
+			} catch (SQLException e1) {
+
+				e1.printStackTrace();
+			}
 			e.printStackTrace();
 		}
-		
+
 	}
 
 }

@@ -3,6 +3,7 @@ package database;
 import java.sql.Connection;
 import java.util.*;
 
+import exceptions.InvalidInputException;
 import socialnetwork.main.*;
 
 public interface PostDAO {
@@ -20,6 +21,14 @@ public interface PostDAO {
 	public Post selectPost(int postId, Connection connection);
 
 	public Set<User> getLikes(Post p, Connection connection);
+
+	public void deletePost(Post post, Connection connection);
+
+	public List<Post> getUserPosts(User user, Connection conn);
+
+	void findHashtags(String text, Post post, Connection connection) throws InvalidInputException;
+
+	void mapHashtagsToPost(Hashtag hashtag, Post post, Connection connection);
 
 	
 	
