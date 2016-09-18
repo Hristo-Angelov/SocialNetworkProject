@@ -35,7 +35,7 @@ public class TestPostDAOModule {
 		user.setUserId(4);
 		post.setDateWhenPosted(LocalDateTime.now());
 		post.setPostId(4);
-		post.setText("test post #insertUnique #123");
+		post.setText("test postjvhfdjkbhjfdb");
 		post.setPostType(PostType.REGULAR);
 		post.setPoster(user);
 		PostDAOImpl.getInstance().insertPost(post, DBTestConnection.getInstance().getConnection());
