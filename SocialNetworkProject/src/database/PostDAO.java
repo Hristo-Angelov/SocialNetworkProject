@@ -26,9 +26,13 @@ public interface PostDAO {
 
 	public List<Post> getUserPosts(User user, Connection conn);
 
-	void findHashtags(String text, Post post, Connection connection) throws InvalidInputException;
+
 
 	void mapHashtagsToPost(Hashtag hashtag, Post post, Connection connection);
+
+	void insertPost(Post post, Connection connection);
+
+	void findHashtags(Post post, Connection connection) throws InvalidInputException;
 
 	
 	

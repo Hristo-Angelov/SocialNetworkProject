@@ -26,22 +26,19 @@ public class TestPostDAOModule {
 //	}
 	
 	
-	
+//	
 	@Test
 	
-	public void postInsertionTest(){
+	public void postInsertionTest() throws InvalidInputException{
 		Post post = new Post();
+		User user  = new User();
+		user.setUserId(4);
 		post.setDateWhenPosted(LocalDateTime.now());
 		post.setPostId(4);
-		post.setText("test post #unikalen_post #unikalnarabota");
+		post.setText("test post #insertUnique #123");
 		post.setPostType(PostType.REGULAR);
-		
-		try {
-			PostDAOImpl.getInstance().findHashtags("test post #unikalen_post #unikalnarabota", post, DBTestConnection.getInstance().getConnection());
-		} catch (InvalidInputException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		};
+		post.setPoster(user);
+		PostDAOImpl.getInstance().insertPost(post, DBTestConnection.getInstance().getConnection());
 		
 	}
 	
@@ -54,6 +51,32 @@ public class TestPostDAOModule {
 //		Set<User> userLikes = PostDAOImpl.getInstance().getLikes(p, DBTestConnection.getInstance().getConnection());
 //		assertNotNUll(userLikes);
 //	}
+//	
+//	@Test
+//	public void testDeletePost(){
+//		Post post  = new Post();
+//		post.setDateWhenPosted(LocalDateTime.now());
+//		post.setPostId(6);
+//		
+//	PostDAOImpl.getInstance().deletePost(post, DBTestConnection.getInstance().getConnection());
+//	
+//	
+//	}
+	
+//	@Test
+//	public void insertTest(){
+//		Post post  = new Post();
+//		post.setDateWhenPosted(LocalDateTime.now());
+//		post.setPostType(PostType.REGULAR);
+//		post.setText("sala bala nov post test");
+//		User user = new User();
+//		user.setUserId(5);
+//		post.setPoster(user);
+//		
+//		PostDAOImpl.getInstance().insertPost(post, DBTestConnection.getInstance().getConnection());
+//	}
+	
+	
 
 	private void assertNotNUll(Set<User> userLikes) {
 		// TODO Auto-generated method stub

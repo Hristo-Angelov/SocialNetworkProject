@@ -70,22 +70,23 @@ public class PostDAOImpl implements PostDAO {
 
 	}
 
+	@Override
 	public void insertPost(Post post, Connection connection) {
 
 		PreparedStatement st = null;
-		try {
-			this.findHashtags(post.getText(), post, connection);
-		} catch (InvalidInputException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+//		try {
+//			this.findHashtags(post, connection);
+//		} catch (InvalidInputException e1) {
+//
+//			e1.printStackTrace();
+//		}
 
 		String query = "INSERT INTO posts (user_id,text,original_post_id, post_type ,create_time) "
 				+ "VALUES (?,?,?,?,now())";
 		try {
 			st = connection.prepareStatement(query);
-			User user = post.getPoster();
-			// System.out.println("User: " + user.getUserId());
+
+//			 System.out.println("User: " + user.getUserId());
 			st.setInt(1, post.getPoster().getUserId());
 			st.setString(2, post.getText());
 			if (post.getOriginalPost() == null) {
@@ -242,27 +243,19 @@ public class PostDAOImpl implements PostDAO {
 	}
 
 	@Override
-	public void findHashtags(String text, Post post, Connection connection) throws InvalidInputException {
-		try {
-			connection.setAutoCommit(false);
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+	public void findHashtags(Post post, Connection connection) throws InvalidInputException {
+		
 		List<Hashtag> hashtags = new ArrayList<Hashtag>();
-		Matcher matcher = HASHTAG_REGEX.matcher(text);
+		Matcher matcher = HASHTAG_REGEX.matcher(post.getText());
 
 		while (matcher.find()) {
 			Hashtag hashtag = new Hashtag(matcher.group(0));
 			String sqlSelect = "SELECT * FROM hashtags WHERE hashtag_text LIKE '" + hashtag.getName() + "';";
 			ResultSet rs = null;
-			try (PreparedStatement statement = connection.prepareStatement(sqlSelect);) {
-
-				
+			try  {
+				PreparedStatement statement = connection.prepareStatement(sqlSelect);
 				rs = statement.executeQuery(sqlSelect);
-				
-				
-				
+
 				if (rs.next()) {
 					int count = rs.getInt("count");
 					count++;
@@ -282,13 +275,13 @@ public class PostDAOImpl implements PostDAO {
 
 					insertStatement.executeUpdate();
 					hashtags.add(hashtag);
-				
+
 				}
 
 			} catch (SQLException e) {
 
 				e.printStackTrace();
-			}finally{
+			} finally {
 				DBUtil.closeResultSet(rs);
 			}
 
@@ -297,18 +290,9 @@ public class PostDAOImpl implements PostDAO {
 		for (Hashtag hashtag : hashtags) {
 			this.mapHashtagsToPost(hashtag, post, connection);
 		}
-		try {
-			connection.commit();
-		} catch (SQLException e) {
-			try {
-				connection.rollback();
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			e.printStackTrace();
-		}
-
+		
+		
+		
 	}
 
 	@Override
@@ -400,21 +384,17 @@ public class PostDAOImpl implements PostDAO {
 	@Override
 	public void deletePost(Post post, Connection connection) {
 
-		String deleteFromLikesSql = "DELETE FROM likes where post_id  =  (?)";
+		String deleteFromLikesSql = "DELETE FROM likes where post  =  (?)";
 
 		PreparedStatement statement = null;
 		try {
 			statement = connection.prepareStatement(deleteFromLikesSql);
 			statement.setInt(1, post.getPostId());
-			statement.executeUpdate();
-
+			int numberOfRows = statement.executeUpdate();
+			System.out.println(numberOfRows);
 		} catch (SQLException e1) {
 
 			e1.printStackTrace();
-		}
-
-		if (post.getPostType().ordinal() >= 1) {
-
 		}
 
 		String sql = "DELETE FROM posts WHERE post_id = (?);";
