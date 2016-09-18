@@ -34,7 +34,7 @@ public class User implements IUser, Serializable, Comparable {
 	// automatically tracked user data
 	private List<Post> likedPosts = new ArrayList<Post>();
 	private List<Post> userPosts = new ArrayList<Post>();
-	private Set<Post> newsfeed = new TreeSet<Post>();
+	private List<Post> newsfeed = new ArrayList<Post>();
 
 	private List<User> followers = new ArrayList<User>();
 	private Set<User> followedUsers = new HashSet<User>();
@@ -354,15 +354,15 @@ public class User implements IUser, Serializable, Comparable {
 		this.userId = userId;
 	}
 	
-	public Set<Post> getNewsfeed() {
+	public List<Post> getNewsfeed() {
 		ConnectionPool pool = ConnectionPool.getInstance();
 		Connection connection = pool.getConnection();
-		Set<Post> feed = PostDAOImpl.getInstance().getNewsfeed(this, connection);
+		List<Post> feed = PostDAOImpl.getInstance().getNewsfeed(this, connection);
 		pool.freeConnection(connection);
 		return feed;
 	}
 
-	public void setNewsfeed(Set<Post> newsfeed) {
+	public void setNewsfeed(List<Post> newsfeed) {
 		this.newsfeed = newsfeed;
 	}
 

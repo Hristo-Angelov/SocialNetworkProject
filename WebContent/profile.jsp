@@ -1,3 +1,4 @@
+<%@page import="database.PostDAOImpl"%>
 <%@ page import="database.UserDAOImpl"%>
 <%@ page import="database.ConnectionPool"%>
 <%@ page import="java.sql.Connection"%>

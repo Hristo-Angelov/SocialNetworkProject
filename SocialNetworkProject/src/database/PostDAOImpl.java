@@ -320,8 +320,8 @@ public class PostDAOImpl implements PostDAO {
 	// return this.getNewsfeed(user, connection);
 	// }
 
-	public Set<Post> getNewsfeed(User user, Connection connection) {
-		Set<Post> newsFeed = new TreeSet<Post>((p1, p2) -> p1.getDateWhenPosted().compareTo(p2.getDateWhenPosted()));
+	public List<Post> getNewsfeed(User user, Connection connection) {
+		List<Post> newsFeed = new ArrayList<Post>();
 
 		String followersQuery = "SELECT p.post_id FROM users u "
 				+ "JOIN followers f ON (f.follower_id = u.user_id) "
@@ -334,7 +334,7 @@ public class PostDAOImpl implements PostDAO {
 				int id = rs.getInt("post_id");
 				newsFeed.add(this.selectPost(id, connection));
 			}
-
+			newsFeed.sort((p1, p2) -> p1.compareTo(p2));
 		} catch (SQLException e) {
 
 			e.printStackTrace();

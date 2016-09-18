@@ -41,7 +41,6 @@ td 		{padding: 10px;}
 			<i>No Posts</i>
 		</p>
 	</c:if>
-	<br>
 	<tr>
 		<td>
 			<a href="profile.jsp?username=${post.poster.username}"> 
