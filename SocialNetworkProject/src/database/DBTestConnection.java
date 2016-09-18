@@ -2,6 +2,7 @@ package database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class DBTestConnection {
 	private static DBTestConnection instance;
@@ -33,6 +34,12 @@ public class DBTestConnection {
 	}
 
 	public Connection getConnection() {
-		return connection;
+		try {
+			return DriverManager.getConnection("jdbc:mysql://" + DB_HOST + ":" + DB_PORT + "/" + DB_SCHEMA,
+					DB_USERNAME, DB_PASSWORD);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }
