@@ -204,7 +204,7 @@ public class PostDAOImpl implements PostDAO {
 				newPost.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id"), connection));
 				answers.add(newPost);
 			}
-			post.setNewReplies(answers);
+			post.setReplies(answers);
 
 		} catch (SQLException e) {
 
@@ -366,7 +366,7 @@ public class PostDAOImpl implements PostDAO {
 
 				likes.add(user);
 			}
-			post.setNewLikes(likes);
+			post.setLikes(likes);
 
 		} catch (SQLException e) {
 

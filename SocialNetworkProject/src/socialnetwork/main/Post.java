@@ -332,4 +332,18 @@ public class Post implements Comparable<Post>{
 		return o.getDateWhenPosted().compareTo(this.getDateWhenPosted());
 	}
 
+	public List<Post> getRetweets() {
+		return retweets;
+	}
+
+	public void setRetweets(List<Post> retweets) {
+		this.retweets = retweets;
+	}
+
+	public void setReplies(Set<Post> replies) {
+		this.replies = replies;
+	}
+
+	
+	
 }

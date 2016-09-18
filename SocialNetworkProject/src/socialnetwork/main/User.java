@@ -212,6 +212,7 @@ public class User implements IUser, Serializable, Comparable {
 		Connection connection = pool.getConnection();
 		List<User> followers = UserDAOImpl.getInstance().getFollowers(this.userId, connection);
 		pool.freeConnection(connection);
+		this.followers = followers;
 		return followers;
 	}
 
