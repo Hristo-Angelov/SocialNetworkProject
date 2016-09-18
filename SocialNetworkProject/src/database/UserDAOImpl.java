@@ -236,12 +236,31 @@ public class UserDAOImpl implements UserDAO {
 			ps = connection.prepareStatement(query);
 			ps.setInt(1, follower.getUserId());
 			ps.setInt(2, subject.getUserId());
-			ps.executeQuery();
+			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			DBUtil.closePreparedStatement(ps);
 		}
+	}
+	
+	public void unfollowUser(User subject, User follower, Connection connection){
+		PreparedStatement ps = null;
+		
+		String query = "DELETE FROM followers WHERE subject_id = (?) AND follower_id = (?);";
+		
+		try {
+			ps = connection.prepareStatement(query);
+			ps.setInt(1, subject.getUserId());
+			ps.setInt(2, follower.getUserId());
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			DBUtil.closePreparedStatement(ps);
+		}
+		
 	}
 	
 	

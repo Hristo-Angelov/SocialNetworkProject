@@ -16,6 +16,8 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import database.ConnectionPool;
+import database.PostDAOImpl;
 import exceptions.InvalidInputException;
 
 public class Post implements Comparable<Post>{
@@ -35,26 +37,11 @@ public class Post implements Comparable<Post>{
 	private PostType postType;
 	private static int idCounter = 0;
 
-	private List<User> likes = new ArrayList<User>();
-	private Set<User> newLikes = new TreeSet<User>((u1,u2) -> u1.getUsername().compareTo(u2.getUsername()));
-	private List<Post> replies = new ArrayList<Post>();
-	private Set<Post> newReplies = new TreeSet<Post>((r1,r2) -> r2.getDateWhenPosted().compareTo(r1.getDateWhenPosted()));
-	public Set<User> getNewLikes() {
-		return newLikes;
-	}
 
-	public void setNewLikes(Set<User> newLikes) {
-		this.newLikes = newLikes;
-	}
+	private Set<User> likes = new TreeSet<User>((u1,u2) -> u1.getUsername().compareTo(u2.getUsername()));
 
-	public Set<Post> getNewReplies() {
-		return newReplies;
-	}
-
-	public void setNewReplies(Set<Post> newReplies) {
-		this.newReplies = newReplies;
-	}
-
+	private Set<Post> replies = new TreeSet<Post>((r1,r2) -> r2.getDateWhenPosted().compareTo(r1.getDateWhenPosted()));
+	
 	public Set<Post> getNewRetweets() {
 		return newRetweets;
 	}
@@ -68,7 +55,7 @@ public class Post implements Comparable<Post>{
 	private List<Hashtag> hashtags = new ArrayList<Hashtag>();
 	
 
-	public void setLikes(List<User> likes) {
+	public void setLikes(Set<User> likes) {
 		this.likes = likes;
 	}
 
@@ -84,6 +71,15 @@ public class Post implements Comparable<Post>{
 //		this.findHashtags(text);
 		Post.idCounter++;
 		this.postId = Post.idCounter;
+	}
+
+	public Set<Post> getReplies() {
+		ConnectionPool pool = ConnectionPool.getInstance();
+		Connection connection = pool.getConnection();
+		Set<Post> reps =PostDAOImpl.getInstance().getReplies(this,connection) ;
+		pool.freeConnection(connection);
+		this.replies = reps;
+		return reps;
 	}
 
 	public Post() {
@@ -291,11 +287,14 @@ public class Post implements Comparable<Post>{
 		return formattedDateTime;
 	}
 
-	public List<Post> getAnswers() {
-		return replies;
-	}
+	
 
-	public List<User> getLikes() {
+	public Set<User> getLikes() {
+		ConnectionPool pool = ConnectionPool.getInstance();
+		Connection connection = pool.getConnection();
+		Set<User> likes =PostDAOImpl.getInstance().getLikes(this,connection) ;
+		pool.freeConnection(connection);
+		this.likes = likes;
 		return likes;
 	}
 
