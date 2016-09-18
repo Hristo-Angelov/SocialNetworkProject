@@ -19,6 +19,8 @@ public interface PostDAO {
 
 	public Post selectPost(int postId, Connection connection);
 
+	public Set<User> getLikes(Post p, Connection connection);
+
 	
 	
 

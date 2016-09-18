@@ -12,11 +12,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
+import database.PostDAOImpl;
 import exceptions.InvalidInputException;
 import interfaces.IUser;
 
-public class User implements IUser, Serializable {
+public class User implements IUser, Serializable, Comparable {
 
 	// required fields
 	private int userId;
@@ -32,12 +34,13 @@ public class User implements IUser, Serializable {
 	private boolean isPrivate;
 
 	// automatically tracked user data
-	private final List<Post> likedPosts = new ArrayList<Post>();
-	private final List<Post> myPosts = new ArrayList<Post>();
+	private List<Post> likedPosts = new ArrayList<Post>();
+	private List<Post> myPosts = new ArrayList<Post>();
+	private Set<Post> newsfeed = new TreeSet<Post>();
 
-	private final List<User> followers = new ArrayList<User>();
-	private final Set<User> followedUsers = new HashSet<User>();
-	private final List<User> followRequests = new ArrayList<User>();
+	private List<User> followers = new ArrayList<User>();
+	private Set<User> followedUsers = new HashSet<User>();
+	private List<User> followRequests = new ArrayList<User>();
 
 	public User() {
 		this.joinDate = LocalDate.now();
@@ -343,5 +346,20 @@ public class User implements IUser, Serializable {
 	public void setUserId(int userId) {
 		this.userId = userId;
 	}
+	
+	public Set<Post> getNewsfeed() {
+		return PostDAOImpl.getInstance().getNewsfeed(this);
+	}
+
+	public void setNewsfeed(Set<Post> newsfeed) {
+		this.newsfeed = newsfeed;
+	}
+
+	@Override
+	public int compareTo(Object other) {
+		return this.username.compareTo(((User)other).getUsername());
+	}
+	
+	
 	
 }
