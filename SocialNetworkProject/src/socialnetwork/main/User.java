@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import database.ConnectionPool;
 import database.PostDAOImpl;
 import database.UserDAOImpl;
 import exceptions.InvalidInputException;
@@ -117,7 +118,11 @@ public class User implements IUser, Serializable, Comparable {
 	}
 
 	public List<Post> getUserPosts() {
-		return PostDAOImpl.getInstance().getUserPosts(this);
+		ConnectionPool pool = ConnectionPool.getInstance();
+		Connection connection = pool.getConnection();
+		List<Post> userPosts = PostDAOImpl.getInstance().getUserPosts(this, connection);
+		pool.freeConnection(connection);
+		return userPosts;
 	}
 
 
@@ -207,7 +212,11 @@ public class User implements IUser, Serializable, Comparable {
 	}
 
 	public List<User> getFollowers() {
-		return UserDAOImpl.getInstance().getFollowers(this.userId);
+		ConnectionPool pool = ConnectionPool.getInstance();
+		Connection connection = pool.getConnection();
+		List<User> followers = UserDAOImpl.getInstance().getFollowers(this.userId, connection);
+		pool.freeConnection(connection);
+		return followers;
 	}
 
 	public Set<User> getFollowedUsers() {
@@ -349,7 +358,11 @@ public class User implements IUser, Serializable, Comparable {
 	}
 	
 	public Set<Post> getNewsfeed() {
-		return PostDAOImpl.getInstance().getNewsfeed(this);
+		ConnectionPool pool = ConnectionPool.getInstance();
+		Connection connection = pool.getConnection();
+		Set<Post> feed = PostDAOImpl.getInstance().getNewsfeed(this, connection);
+		pool.freeConnection(connection);
+		return feed;
 	}
 
 	public void setNewsfeed(Set<Post> newsfeed) {

@@ -29,6 +29,7 @@ public class UserDAOImpl implements UserDAO {
 //		return isUsernameAvailable(username, connection);
 //	}
 	
+	@Override
 	public boolean isUsernameAvailable(String username, Connection connection) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -54,6 +55,7 @@ public class UserDAOImpl implements UserDAO {
 //		return isEmailAvailable(email, connection);
 //	}
 	
+	@Override
 	public boolean isEmailAvailable(String email, Connection connection) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -79,6 +81,7 @@ public class UserDAOImpl implements UserDAO {
 //		insertUser(user, connection);
 //	}
 
+	@Override
 	public void insertUser(User user, Connection connection) {
 		PreparedStatement ps = null;
 		System.out.println("inserting user: " + user.getUsername());
@@ -112,6 +115,7 @@ public class UserDAOImpl implements UserDAO {
 //		return selectUser(username, connection);
 //	}
 
+	@Override
 	public User selectUser(String username, Connection connection) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -148,6 +152,7 @@ public class UserDAOImpl implements UserDAO {
 //		return selectUser(userID, connection);
 //	}
 
+	@Override
 	public User selectUser(int userID, Connection connection) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -177,11 +182,11 @@ public class UserDAOImpl implements UserDAO {
 		}
 	}
 	
-	@Override
-	public String getUserPasswordHash(String username) {
-		String pass = selectUser(username).getPassword().trim();
-		return pass;
-	}
+//	@Override
+//	public String getUserPasswordHash(String username) {
+//		String pass = selectUser(username).getPassword().trim();
+//		return pass;
+//	}
 	
 	@Override
 	public String getUserPasswordHash(String username, Connection connection) {

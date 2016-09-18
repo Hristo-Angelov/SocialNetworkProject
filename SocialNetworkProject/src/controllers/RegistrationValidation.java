@@ -1,7 +1,9 @@
 package controllers;
 
+import java.sql.Connection;
 import java.util.regex.Pattern;
 
+import database.ConnectionPool;
 import database.UserDAOImpl;
 
 public class RegistrationValidation {
@@ -35,11 +37,14 @@ public class RegistrationValidation {
 		String emailMessage;
 		if (email != null && !email.trim().isEmpty()) {
 			if (EMAIL_REGEX.matcher(email).matches()) {
-				if (UserDAOImpl.getInstance().isEmailAvailable(email)) {
+				ConnectionPool pool = ConnectionPool.getInstance();
+				Connection connection = pool.getConnection();
+				if (UserDAOImpl.getInstance().isEmailAvailable(email, connection)) {
 					emailMessage = null;
 				} else {
 					emailMessage = "This email is already taken!";
 				}
+				pool.freeConnection(connection);
 			} else {
 				emailMessage = "Please enter a valid e-mail.";
 			}
@@ -55,11 +60,14 @@ public class RegistrationValidation {
 			if (username.length() >= MIN_USERNAME_LENGTH) {
 				if (username.length() <= MAX_USERNAME_LENGTH) {
 					if (USERNAME_REGEX.matcher(username).matches()) {
-						if (UserDAOImpl.getInstance().isUsernameAvailable(username)) {
+						ConnectionPool pool = ConnectionPool.getInstance();
+						Connection connection = pool.getConnection();
+						if (UserDAOImpl.getInstance().isUsernameAvailable(username, connection)) {
 							usernameMessage = null;
 						} else {
 							usernameMessage = "This username is already taken!";
 						}
+						pool.freeConnection(connection);
 					} else {
 						usernameMessage = "Your username can only contain letters, numbers and '_'.";
 					}

@@ -1,6 +1,7 @@
 package controllers;
 
 import java.io.IOException;
+import java.sql.Connection;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import database.ConnectionPool;
 import database.PostDAO;
 import database.PostDAOImpl;
 import socialnetwork.main.Post;
@@ -62,7 +64,11 @@ public class PostController extends HttpServlet {
 				if (PostValidation.validatePost(post, request.getSession())) {
 					url = "/newsfeed.jsp";
 					PostDAO postDao = PostDAOImpl.getInstance();
-					postDao.insertPost(post);
+					ConnectionPool pool = ConnectionPool.getInstance();
+					Connection connection = pool.getConnection();
+					postDao.insertPost(post, connection);
+					pool.freeConnection(connection);
+					
 				} else {
 					url = "/newsfeed.jsp";
 				}

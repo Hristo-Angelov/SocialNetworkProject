@@ -1,6 +1,7 @@
 package controllers;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import database.ConnectionPool;
 import database.PostDAOImpl;
 import database.UserDAO;
 import database.UserDAOImpl;
@@ -59,7 +61,10 @@ public class UserController extends HttpServlet {
 				if (usernameMessage == null && emailMessage == null && passwordMessage == null) {
 					url = "/newsfeed.jsp";
 					UserDAO userDao = UserDAOImpl.getInstance();
-					userDao.insertUser(user);
+					ConnectionPool pool = ConnectionPool.getInstance();
+					Connection connection = pool.getConnection();
+					userDao.insertUser(user, connection);
+					pool.freeConnection(connection);
 					user = setUserToSession(session, user);
 				} else {
 					url = "/registration.jsp";
@@ -102,7 +107,10 @@ public class UserController extends HttpServlet {
 
 	private User setUserToSession(HttpSession session, User user) {
 		UserDAO userDao = UserDAOImpl.getInstance();
-		user = userDao.selectUser(user.getUsername());
+		ConnectionPool pool = ConnectionPool.getInstance();
+		Connection connection = pool.getConnection();
+		user = userDao.selectUser(user.getUsername(), connection);
+		pool.freeConnection(connection);
 		session.setAttribute("user", user);
 		return user;
 	}

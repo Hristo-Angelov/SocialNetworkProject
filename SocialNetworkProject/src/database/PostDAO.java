@@ -34,6 +34,8 @@ public interface PostDAO {
 
 	void findHashtags(Post post, Connection connection) throws InvalidInputException;
 
+	public Set<Post> getNewsfeed(User user, Connection connection);
+
 	
 	
 

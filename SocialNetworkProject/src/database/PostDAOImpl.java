@@ -70,6 +70,7 @@ public class PostDAOImpl implements PostDAO {
 	public void insertPost(Post post, Connection connection) {
 
 		PreparedStatement st = null;
+
 		String query = "INSERT INTO posts (user_id,text,original_post_id, post_type ,create_time) "
 				+ "VALUES (?,?,?,?,now())";
 		try {
