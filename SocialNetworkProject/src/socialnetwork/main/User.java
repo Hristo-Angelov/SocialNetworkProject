@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import database.PostDAOImpl;
+import database.UserDAOImpl;
 import exceptions.InvalidInputException;
 import interfaces.IUser;
 
@@ -206,7 +207,7 @@ public class User implements IUser, Serializable, Comparable {
 	}
 
 	public List<User> getFollowers() {
-		return followers;
+		return UserDAOImpl.getInstance().getFollowers(this.userId);
 	}
 
 	public Set<User> getFollowedUsers() {

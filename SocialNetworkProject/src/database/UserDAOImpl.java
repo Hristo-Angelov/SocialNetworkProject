@@ -1,6 +1,12 @@
 package database;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import socialnetwork.main.PasswordUtil;
 import socialnetwork.main.User;
@@ -8,11 +14,8 @@ import socialnetwork.main.User;
 public class UserDAOImpl implements UserDAO {
 
 	private static UserDAO userDao = null;
-	private static ConnectionPool pool;
 
-	private UserDAOImpl() {
-		pool = ConnectionPool.getInstance();
-	}
+	private UserDAOImpl() { }
 
 	public static synchronized UserDAO getInstance() {
 		if (userDao == null) {
@@ -21,10 +24,10 @@ public class UserDAOImpl implements UserDAO {
 		return userDao;
 	}
 
-	public boolean isUsernameAvailable(String username) {
-		Connection connection = pool.getConnection();
-		return isUsernameAvailable(username, connection);
-	}
+//	public boolean isUsernameAvailable(String username) {
+//		Connection connection = pool.getConnection();
+//		return isUsernameAvailable(username, connection);
+//	}
 	
 	public boolean isUsernameAvailable(String username, Connection connection) {
 		PreparedStatement ps = null;
@@ -43,14 +46,13 @@ public class UserDAOImpl implements UserDAO {
 		} finally {
 			DBUtil.closeResultSet(rs);
 			DBUtil.closePreparedStatement(ps);
-			pool.freeConnection(connection);
 		}
 	}
 
-	public boolean isEmailAvailable(String email) {
-		Connection connection = pool.getConnection();
-		return isEmailAvailable(email, connection);
-	}
+//	public boolean isEmailAvailable(String email) {
+//		Connection connection = pool.getConnection();
+//		return isEmailAvailable(email, connection);
+//	}
 	
 	public boolean isEmailAvailable(String email, Connection connection) {
 		PreparedStatement ps = null;
@@ -69,14 +71,13 @@ public class UserDAOImpl implements UserDAO {
 		} finally {
 			DBUtil.closeResultSet(rs);
 			DBUtil.closePreparedStatement(ps);
-			pool.freeConnection(connection);
 		}
 	}
 
-	public void insertUser(User user) {
-		Connection connection = pool.getConnection();
-		insertUser(user, connection);
-	}
+//	public void insertUser(User user) {
+//		Connection connection = pool.getConnection();
+//		insertUser(user, connection);
+//	}
 
 	public void insertUser(User user, Connection connection) {
 		PreparedStatement ps = null;
@@ -94,7 +95,6 @@ public class UserDAOImpl implements UserDAO {
 			e.printStackTrace();
 		} finally {
 			DBUtil.closePreparedStatement(ps);
-			pool.freeConnection(connection);
 		}
 	}
 	
@@ -106,11 +106,11 @@ public class UserDAOImpl implements UserDAO {
 		// TODO
 	}
 
-	@Override
-	public User selectUser(String username) {
-		Connection connection = pool.getConnection();
-		return selectUser(username, connection);
-	}
+//	@Override
+//	public User selectUser(String username) {
+//		Connection connection = pool.getConnection();
+//		return selectUser(username, connection);
+//	}
 
 	public User selectUser(String username, Connection connection) {
 		PreparedStatement ps = null;
@@ -137,16 +137,16 @@ public class UserDAOImpl implements UserDAO {
 			e.printStackTrace();
 			return null;
 		} finally {
+			DBUtil.closeResultSet(rs);
 			DBUtil.closePreparedStatement(ps);
-			pool.freeConnection(connection);
 		}
 	}
 	
-	@Override
-	public User selectUser(int userID) {
-		Connection connection = pool.getConnection();
-		return selectUser(userID, connection);
-	}
+//	@Override
+//	public User selectUser(int userID) {
+//		Connection connection = pool.getConnection();
+//		return selectUser(userID, connection);
+//	}
 
 	public User selectUser(int userID, Connection connection) {
 		PreparedStatement ps = null;
@@ -183,9 +183,43 @@ public class UserDAOImpl implements UserDAO {
 		return pass;
 	}
 	
+	@Override
 	public String getUserPasswordHash(String username, Connection connection) {
 		String pass = selectUser(username, connection).getPassword().trim();
 		return pass;
+	}
+	
+//	@Override
+//	public List<User> getFollowers(int userId) {
+//		return getFollowers(userId, pool.getConnection());
+//	}
+	
+	@Override
+	public List<User> getFollowers(int userId, Connection connection) {
+		Statement stmt = null;
+		ResultSet rs = null;
+		List<User> followers = new ArrayList<>();
+		
+		String followersQuery = "SELECT f.follower_id FROM users u "
+				+ "JOIN followers f "
+				+ "ON (f.subject_id = u.user_id) "
+				+ "WHERE u.user_id = " + userId;
+
+		try {
+			stmt = connection.createStatement();
+			stmt.executeQuery(followersQuery);
+			rs = stmt.getResultSet();
+			while (rs.next()) {
+				followers.add(selectUser(rs.getString(1), connection));
+			}
+			return followers;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			DBUtil.closeResultSet(rs);
+			DBUtil.closeStatement(stmt);
+		}
 	}
 
 }

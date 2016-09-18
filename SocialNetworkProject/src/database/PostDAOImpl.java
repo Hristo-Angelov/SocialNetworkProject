@@ -29,12 +29,8 @@ public class PostDAOImpl implements PostDAO {
 	private static final int START_COUNT_VALUE = 1;
 
 	private static PostDAO postDao = null;
-	private static ConnectionPool pool;
 
-	public PostDAOImpl() {
-		pool = ConnectionPool.getInstance();
-
-	}
+	public PostDAOImpl() {}
 
 	public static synchronized PostDAO getInstance() {
 		if (postDao == null) {
@@ -43,10 +39,10 @@ public class PostDAOImpl implements PostDAO {
 		return postDao;
 	}
 
-	public void addLike(Post post, User user) {
-		Connection conn = pool.getConnection();
-		this.addLike(post, user, conn);
-	}
+//	public void addLike(Post post, User user) {
+//		Connection conn = pool.getConnection();
+//		this.addLike(post, user, conn);
+//	}
 
 	public void addLike(Post post, User user, Connection conn) {
 
@@ -63,12 +59,12 @@ public class PostDAOImpl implements PostDAO {
 
 	}
 
-	@Override
-	public void insertPost(Post post) {
-		Connection connection = pool.getConnection();
-		this.insertPost(post, connection);
-
-	}
+//	@Override
+//	public void insertPost(Post post) {
+//		Connection connection = pool.getConnection();
+//		this.insertPost(post, connection);
+//
+//	}
 
 	@Override
 	public void insertPost(Post post, Connection connection) {
@@ -105,17 +101,16 @@ public class PostDAOImpl implements PostDAO {
 
 		} finally {
 			DBUtil.closePreparedStatement(st);
-			pool.freeConnection(connection);
 		}
 
 	}
 
-	@Override
-	public Post selectPost(int postId) {
-		Connection connection = pool.getConnection();
-		Post post = this.selectPost(postId, connection);
-		return post;
-	}
+//	@Override
+//	public Post selectPost(int postId) {
+//		Connection connection = pool.getConnection();
+//		Post post = this.selectPost(postId, connection);
+//		return post;
+//	}
 
 	@Override
 	public Post selectPost(int postId, Connection connection) {
@@ -146,18 +141,17 @@ public class PostDAOImpl implements PostDAO {
 			e.printStackTrace();
 
 		} finally {
-			pool.freeConnection(connection);
 
 		}
 
 		return post;
 	}
 
-	public Set<Retweet> getRetweets(Post post) {
-		Connection connection = pool.getConnection();
-		Set<Retweet> retweets = this.getRetweets(post);
-		return retweets;
-	}
+//	public Set<Retweet> getRetweets(Post post) {
+//		Connection connection = pool.getConnection();
+//		Set<Retweet> retweets = this.getRetweets(post);
+//		return retweets;
+//	}
 
 	public Set<Retweet> getRetweets(Post post, Connection connection) {
 		Set<Post> retweets = new HashSet<Post>();
@@ -177,16 +171,15 @@ public class PostDAOImpl implements PostDAO {
 
 			e.printStackTrace();
 		} finally {
-			pool.freeConnection(connection);
 
 		}
 		return null;
 	}
 
-	public Set<Post> getReplies(Post post) {
-		Connection connection = pool.getConnection();
-		return this.getReplies(post, connection);
-	}
+//	public Set<Post> getReplies(Post post) {
+//		Connection connection = pool.getConnection();
+//		return this.getReplies(post, connection);
+//	}
 
 	public Set<Post> getReplies(Post post, Connection connection) {
 		Set<Post> answers = new HashSet<Post>();
@@ -212,32 +205,31 @@ public class PostDAOImpl implements PostDAO {
 		return answers;
 	}
 
-	@Override
-	public List<Post> getUserPosts(User user) {
-		Connection conn = pool.getConnection();
-		return this.getUserPosts(user, conn);
-	}
+//	@Override
+//	public List<Post> getUserPosts(User user) {
+//		Connection conn = pool.getConnection();
+//		return this.getUserPosts(user, conn);
+//	}
 
 	@Override
-	public List<Post> getUserPosts(User user, Connection conn) {
+	public List<Post> getUserPosts(User user, Connection connection) {
 
 		List<Post> posts = new ArrayList<Post>();
 
 		String query = "SELECT post_id FROM posts WHERE user_id = (?)";
-		try (PreparedStatement statement = conn.prepareStatement(query);) {
+		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setInt(1, user.getUserId());
 
 			ResultSet rs = statement.executeQuery();
 			while (rs.next()) {
 				int postId = rs.getInt(1);
-				Post post = this.selectPost(postId);
+				Post post = this.selectPost(postId, connection);
 				posts.add(post);
 
 			}
 			return posts;
 
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -314,11 +306,11 @@ public class PostDAOImpl implements PostDAO {
 		}
 	}
 
-	@Override
-	public Set<Post> getNewsfeed(User user) {
-		Connection connection = pool.getConnection();
-		return this.getNewsfeed(user, connection);
-	}
+//	@Override
+//	public Set<Post> getNewsfeed(User user) {
+//		Connection connection = pool.getConnection();
+//		return this.getNewsfeed(user, connection);
+//	}
 
 	public Set<Post> getNewsfeed(User user, Connection connection) {
 		Set<Post> newsFeed = new TreeSet<Post>((p1, p2) -> p1.getDateWhenPosted().compareTo(p2.getDateWhenPosted()));
@@ -331,23 +323,22 @@ public class PostDAOImpl implements PostDAO {
 
 			while (rs.next()) {
 				int id = rs.getInt("post_id");
-				newsFeed.add(this.selectPost(id));
+				newsFeed.add(this.selectPost(id, connection));
 			}
 
 		} catch (SQLException e) {
 
 			e.printStackTrace();
 		} finally {
-			pool.freeConnection(connection);
 		}
 		return newsFeed;
 	}
 
-	@Override
-	public TreeSet<User> getLikes(Post post) {
-		Connection connection = pool.getConnection();
-		return this.getLikes(post, connection);
-	}
+//	@Override
+//	public TreeSet<User> getLikes(Post post) {
+//		Connection connection = pool.getConnection();
+//		return this.getLikes(post, connection);
+//	}
 
 	public TreeSet<User> getLikes(Post post, Connection connection) {
 
@@ -373,15 +364,14 @@ public class PostDAOImpl implements PostDAO {
 
 			e.printStackTrace();
 		} finally {
-			pool.freeConnection(connection);
 		}
 		return likes;
 	}
 
-	public void deletePost(Post post) {
-		Connection connection = pool.getConnection();
-		this.deletePost(post, connection);
-	}
+//	public void deletePost(Post post) {
+//		Connection connection = pool.getConnection();
+//		this.deletePost(post, connection);
+//	}
 
 	@Override
 	public void deletePost(Post post, Connection connection) {

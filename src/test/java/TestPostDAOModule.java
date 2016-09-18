@@ -26,9 +26,7 @@ public class TestPostDAOModule {
 //	}
 	
 	
-//	
 	@Test
-	
 	public void postInsertionTest() throws InvalidInputException{
 		Post post = new Post();
 		User user  = new User();
@@ -78,10 +76,4 @@ public class TestPostDAOModule {
 //		PostDAOImpl.getInstance().insertPost(post, DBTestConnection.getInstance().getConnection());
 //	}
 	
-	
-
-	private void assertNotNUll(Set<User> userLikes) {
-		// TODO Auto-generated method stub
-		
-	}
 }

@@ -1,6 +1,7 @@
 package database;
 
 import java.sql.Connection;
+import java.util.List;
 
 import socialnetwork.main.User;
 
@@ -25,4 +26,10 @@ public interface UserDAO {
 	public User selectUser(int userID);
 
 	public User selectUser(int int1, Connection connection);
+
+	public String getUserPasswordHash(String username, Connection connection);
+
+	public List<User> getFollowers(int userId);
+
+	public List<User> getFollowers(int userId, Connection connection);
 }
