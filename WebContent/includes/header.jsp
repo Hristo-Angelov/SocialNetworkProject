@@ -8,14 +8,22 @@
 	<meta charset="utf-8">
 	<title>Georgi and Hristo's cheap Twitter knock-off</title>
 	<link rel="stylesheet" href="styles/owl.theme.css" type="text/css" />
-	<link rel="stylesheet" href="styles/owl.theme.css" type="text/css" />
+
 </head>
 <body>
-<c:if test="${sessionScope.user != null}">
+	<ul>
+	<li>
 	<a href="newsfeed.jsp">
+	
 		HOME
 	</a>
+	</li>
+	
+	<c:if test="${sessionScope.user != null}">
+	<li>
 	<a href="profile.jsp?username=${sessionScope.user.username}">
 		${sessionScope.user.username}
 	</a>
+	</li>
 </c:if>
+</ul>
