@@ -84,7 +84,6 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public void insertUser(User user, Connection connection) {
 		PreparedStatement ps = null;
-		System.out.println("inserting user: " + user.getUsername());
 		String query = "INSERT INTO users (username, email, password, registration_date, is_private) "
 				+ "VALUES (?, ?, ?, now(), false)";
 		String hashedPass = PasswordUtil.generatePasswordHash(user.getPassword());
@@ -214,8 +213,8 @@ public class UserDAOImpl implements UserDAO {
 			stmt = connection.createStatement();
 			stmt.executeQuery(followersQuery);
 			rs = stmt.getResultSet();
-			while (rs.next()) {
-				followers.add(selectUser(rs.getString(1), connection));
+			while(rs.next()) {
+				followers.add(selectUser(rs.getInt(1), connection));
 			}
 			return followers;
 		} catch (SQLException e) {
@@ -226,5 +225,25 @@ public class UserDAOImpl implements UserDAO {
 			DBUtil.closeStatement(stmt);
 		}
 	}
+	
+	@Override
+	public void followUser(User subject, User follower, Connection connection) {
+		PreparedStatement ps = null;
+		
+		String query = "INSERT INTO followers (follower_id, subject_id) "
+					+ "VALUES (?, ?)";
+		try {
+			ps = connection.prepareStatement(query);
+			ps.setInt(1, follower.getUserId());
+			ps.setInt(2, subject.getUserId());
+			ps.executeQuery();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBUtil.closePreparedStatement(ps);
+		}
+	}
+	
+	
 
 }

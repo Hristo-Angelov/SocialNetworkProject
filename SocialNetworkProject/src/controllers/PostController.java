@@ -53,30 +53,39 @@ public class PostController extends HttpServlet {
 			url = "/login.jsp"; // the "join" page
 			request.setAttribute("message", "You are not logged in.");
 		} else {
+			url = "/newsfeed.jsp";
 			if (action.equals("tweet")) {
-				// get parameters from the request
-				String text = request.getParameter("tweet");
-				User user = (User) session.getAttribute("user");
-				Post post = new Post();
-				post.setText(text);
-				post.setPoster(user);
-				post.setPostType(PostType.REGULAR);
-				if (PostValidation.validatePost(post, request.getSession())) {
-					url = "/newsfeed.jsp";
-					PostDAO postDao = PostDAOImpl.getInstance();
-					ConnectionPool pool = ConnectionPool.getInstance();
-					Connection connection = pool.getConnection();
-					postDao.insertPost(post, connection);
-					pool.freeConnection(connection);
-					
+				this.addTweet(request, session, PostType.REGULAR);
+			} else {
+				if (action.equals("retweet")) {
+					this.addTweet(request, session, PostType.RETWEET);
 				} else {
-					url = "/newsfeed.jsp";
+					if (action.equals("reply")) {
+						this.addTweet(request, session, PostType.ANSWER);
+					}
 				}
-			} 
+			}
 		}
 
 		getServletContext().getRequestDispatcher(url).forward(request, response);
 
+	}
+
+	private void addTweet(HttpServletRequest request, HttpSession session, PostType postType) {
+		// get parameters from the request
+		String text = request.getParameter("tweet");
+		User user = (User) session.getAttribute("user");
+		Post post = new Post();
+		post.setText(text);
+		post.setPoster(user);
+		post.setPostType(postType);
+		if (PostValidation.validatePost(post, request.getSession())) {
+			PostDAO postDao = PostDAOImpl.getInstance();
+			ConnectionPool pool = ConnectionPool.getInstance();
+			Connection connection = pool.getConnection();
+			postDao.insertPost(post, connection);
+			pool.freeConnection(connection);
+		}
 	}
 
 }

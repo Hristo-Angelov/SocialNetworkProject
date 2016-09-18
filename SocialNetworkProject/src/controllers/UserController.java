@@ -2,8 +2,6 @@ package controllers;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -13,11 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import database.ConnectionPool;
-import database.PostDAOImpl;
 import database.UserDAO;
 import database.UserDAOImpl;
-import exceptions.InvalidInputException;
-import socialnetwork.main.Post;
 import socialnetwork.main.User;
 
 /**

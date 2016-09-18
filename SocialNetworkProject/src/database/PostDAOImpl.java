@@ -30,7 +30,8 @@ public class PostDAOImpl implements PostDAO {
 
 	private static PostDAO postDao = null;
 
-	public PostDAOImpl() {}
+	public PostDAOImpl() {
+	}
 
 	public static synchronized PostDAO getInstance() {
 		if (postDao == null) {
@@ -39,10 +40,10 @@ public class PostDAOImpl implements PostDAO {
 		return postDao;
 	}
 
-//	public void addLike(Post post, User user) {
-//		Connection conn = pool.getConnection();
-//		this.addLike(post, user, conn);
-//	}
+	// public void addLike(Post post, User user) {
+	// Connection conn = pool.getConnection();
+	// this.addLike(post, user, conn);
+	// }
 
 	public void addLike(Post post, User user, Connection conn) {
 
@@ -59,12 +60,12 @@ public class PostDAOImpl implements PostDAO {
 
 	}
 
-//	@Override
-//	public void insertPost(Post post) {
-//		Connection connection = pool.getConnection();
-//		this.insertPost(post, connection);
-//
-//	}
+	// @Override
+	// public void insertPost(Post post) {
+	// Connection connection = pool.getConnection();
+	// this.insertPost(post, connection);
+	//
+	// }
 
 	@Override
 	public void insertPost(Post post, Connection connection) {
@@ -105,12 +106,12 @@ public class PostDAOImpl implements PostDAO {
 
 	}
 
-//	@Override
-//	public Post selectPost(int postId) {
-//		Connection connection = pool.getConnection();
-//		Post post = this.selectPost(postId, connection);
-//		return post;
-//	}
+	// @Override
+	// public Post selectPost(int postId) {
+	// Connection connection = pool.getConnection();
+	// Post post = this.selectPost(postId, connection);
+	// return post;
+	// }
 
 	@Override
 	public Post selectPost(int postId, Connection connection) {
@@ -124,16 +125,19 @@ public class PostDAOImpl implements PostDAO {
 		try (Statement st = connection.createStatement(); ResultSet rs = st.executeQuery(query);) {
 
 			post = new Post();
-			rs.next();
-			postType = rs.getInt("post_type");
-			originalPostId = rs.getInt("original_post_id");
-			post.setDateWhenPosted(rs.getTimestamp("create_time").toLocalDateTime());
-			post.setPostId(postId);
-			post.setText(rs.getString("text"));
-			post.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id"), connection));
-			post.setPostType(PostType.fromInt(postType));
-			if (postType != 0) {
-				post.setOriginalPost(selectPost(originalPostId, connection));
+			if (rs.next()) {
+				postType = rs.getInt("post_type");
+				originalPostId = rs.getInt("original_post_id");
+				post.setDateWhenPosted(rs.getTimestamp("create_time").toLocalDateTime());
+				post.setPostId(postId);
+				post.setText(rs.getString("text"));
+				post.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id"), connection));
+				post.setPostType(PostType.fromInt(postType));
+				if (postType != 0) {
+					post.setOriginalPost(selectPost(originalPostId, connection));
+				}
+			} else {
+				System.out.println("No such post");
 			}
 
 		} catch (SQLException e) {
@@ -147,53 +151,57 @@ public class PostDAOImpl implements PostDAO {
 		return post;
 	}
 
-//	public Set<Retweet> getRetweets(Post post) {
-//		Connection connection = pool.getConnection();
-//		Set<Retweet> retweets = this.getRetweets(post);
-//		return retweets;
-//	}
+	// public Set<Retweet> getRetweets(Post post) {
+	// Connection connection = pool.getConnection();
+	// Set<Retweet> retweets = this.getRetweets(post);
+	// return retweets;
+	// }
 
-	public Set<Retweet> getRetweets(Post post, Connection connection) {
+	@Override
+	public Set<Post> getRetweets(Post post, Connection connection) {
 		Set<Post> retweets = new HashSet<Post>();
-		String retweetQuery = "SELECT a.* FROM posts p" + "JOIN posts a ON p.post_id = a.original_post_id"
-				+ "WHERE a.post_type = 2;";
+		String retweetQuery = "SELECT a.* FROM posts p " 
+					+ "JOIN posts a ON p.post_id = a.original_post_id "
+					+ "WHERE a.post_type = 2 AND a.original_post_id = " + post.getPostId();
 		try (PreparedStatement ps = connection.prepareStatement(retweetQuery); ResultSet rs = ps.executeQuery();) {
 
 			while (rs.next()) {
 				Post newPost = new Post();
 				newPost.setText(rs.getString("text"));
 				newPost.setDateWhenPosted(rs.getTimestamp("create_time").toLocalDateTime());
-				// newPost.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id")));
+				newPost.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id"), connection));
 				retweets.add(newPost);
 			}
 
 		} catch (SQLException e) {
-
 			e.printStackTrace();
 		} finally {
 
 		}
-		return null;
+		return retweets;
 	}
 
-//	public Set<Post> getReplies(Post post) {
-//		Connection connection = pool.getConnection();
-//		return this.getReplies(post, connection);
-//	}
+	// public Set<Post> getReplies(Post post) {
+	// Connection connection = pool.getConnection();
+	// return this.getReplies(post, connection);
+	// }
 
+	@Override
 	public Set<Post> getReplies(Post post, Connection connection) {
 		Set<Post> answers = new HashSet<Post>();
 
-		String answerQuery = "SELECT a.* FROM posts p" + "JOIN posts a ON p.post_id = a.original_post_id"
-				+ "WHERE a.post_type = 1;";
-		try (PreparedStatement ps = connection.prepareStatement(answerQuery);
-				ResultSet rs = ps.executeQuery(answerQuery);) {
-
+		String answerQuery = "SELECT a.* FROM posts p " 
+				+ "JOIN posts a ON p.post_id = a.original_post_id "
+				+ "WHERE a.post_type = 1 "
+				+ "AND a.original_post_id = " + post.getPostId();
+		ResultSet rs = null;
+		try (PreparedStatement ps = connection.prepareStatement(answerQuery)) {
+			rs = ps.executeQuery(answerQuery);
 			while (rs.next()) {
 				Post newPost = new Post();
 				newPost.setText(rs.getString("text"));
 				newPost.setDateWhenPosted(rs.getTimestamp("create_time").toLocalDateTime());
-				// newPost.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id")));
+				newPost.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id"), connection));
 				answers.add(newPost);
 			}
 			post.setNewReplies(answers);
@@ -201,15 +209,17 @@ public class PostDAOImpl implements PostDAO {
 		} catch (SQLException e) {
 
 			e.printStackTrace();
+		} finally {
+			DBUtil.closeResultSet(rs);
 		}
 		return answers;
 	}
 
-//	@Override
-//	public List<Post> getUserPosts(User user) {
-//		Connection conn = pool.getConnection();
-//		return this.getUserPosts(user, conn);
-//	}
+	// @Override
+	// public List<Post> getUserPosts(User user) {
+	// Connection conn = pool.getConnection();
+	// return this.getUserPosts(user, conn);
+	// }
 
 	@Override
 	public List<Post> getUserPosts(User user, Connection connection) {
@@ -238,7 +248,7 @@ public class PostDAOImpl implements PostDAO {
 
 	@Override
 	public void findHashtags(Post post, Connection connection) throws InvalidInputException {
-		
+
 		List<Hashtag> hashtags = new ArrayList<Hashtag>();
 		Matcher matcher = HASHTAG_REGEX.matcher(post.getText());
 
@@ -246,7 +256,7 @@ public class PostDAOImpl implements PostDAO {
 			Hashtag hashtag = new Hashtag(matcher.group(0));
 			String sqlSelect = "SELECT * FROM hashtags WHERE hashtag_text LIKE '" + hashtag.getName() + "';";
 			ResultSet rs = null;
-			try  {
+			try {
 				PreparedStatement statement = connection.prepareStatement(sqlSelect);
 				rs = statement.executeQuery(sqlSelect);
 
@@ -284,9 +294,7 @@ public class PostDAOImpl implements PostDAO {
 		for (Hashtag hashtag : hashtags) {
 			this.mapHashtagsToPost(hashtag, post, connection);
 		}
-		
-		
-		
+
 	}
 
 	@Override
@@ -306,11 +314,11 @@ public class PostDAOImpl implements PostDAO {
 		}
 	}
 
-//	@Override
-//	public Set<Post> getNewsfeed(User user) {
-//		Connection connection = pool.getConnection();
-//		return this.getNewsfeed(user, connection);
-//	}
+	// @Override
+	// public Set<Post> getNewsfeed(User user) {
+	// Connection connection = pool.getConnection();
+	// return this.getNewsfeed(user, connection);
+	// }
 
 	public Set<Post> getNewsfeed(User user, Connection connection) {
 		Set<Post> newsFeed = new TreeSet<Post>((p1, p2) -> p1.getDateWhenPosted().compareTo(p2.getDateWhenPosted()));
@@ -334,11 +342,11 @@ public class PostDAOImpl implements PostDAO {
 		return newsFeed;
 	}
 
-//	@Override
-//	public TreeSet<User> getLikes(Post post) {
-//		Connection connection = pool.getConnection();
-//		return this.getLikes(post, connection);
-//	}
+	// @Override
+	// public TreeSet<User> getLikes(Post post) {
+	// Connection connection = pool.getConnection();
+	// return this.getLikes(post, connection);
+	// }
 
 	public TreeSet<User> getLikes(Post post, Connection connection) {
 
@@ -368,10 +376,10 @@ public class PostDAOImpl implements PostDAO {
 		return likes;
 	}
 
-//	public void deletePost(Post post) {
-//		Connection connection = pool.getConnection();
-//		this.deletePost(post, connection);
-//	}
+	// public void deletePost(Post post) {
+	// Connection connection = pool.getConnection();
+	// this.deletePost(post, connection);
+	// }
 
 	@Override
 	public void deletePost(Post post, Connection connection) {

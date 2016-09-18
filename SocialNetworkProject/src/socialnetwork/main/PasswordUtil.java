@@ -23,7 +23,6 @@ public class PasswordUtil {
 			SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
 			byte[] hash = skf.generateSecret(spec).getEncoded();
 			String has = iterations + ":" + toHex(salt) + ":" + toHex(hash);
-			System.out.println("entered password: " + password + "; generate this: " + has);
 			return has;
 		} catch (Exception e) {
 			System.err.println("Password hash generation failed.");

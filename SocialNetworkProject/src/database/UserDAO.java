@@ -20,4 +20,6 @@ public interface UserDAO {
 	boolean isEmailAvailable(String email, Connection connection);
 
 	User selectUser(String username, Connection connection);
+
+	void followUser(User subject, User follower, Connection connection);
 }
