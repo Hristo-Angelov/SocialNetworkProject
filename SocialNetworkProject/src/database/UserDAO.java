@@ -22,4 +22,6 @@ public interface UserDAO {
 	User selectUser(String username, Connection connection);
 
 	void followUser(User subject, User follower, Connection connection);
+
+	void unfollowUser(User subject, User follower, Connection connection);
 }

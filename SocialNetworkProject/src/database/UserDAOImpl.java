@@ -244,6 +244,7 @@ public class UserDAOImpl implements UserDAO {
 		}
 	}
 	
+	@Override
 	public void unfollowUser(User subject, User follower, Connection connection){
 		PreparedStatement ps = null;
 		

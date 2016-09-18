@@ -92,6 +92,30 @@ public class UserController extends HttpServlet {
 					if (action.equals("logout")) {
 						url = "/reglog.jsp";
 						session.setAttribute("user", null);
+					} else {
+						if (action.equals("follow")) {
+							User subject = (User)session.getAttribute("subject");
+							User follower = (User)session.getAttribute("user");
+							session.removeAttribute("subject");
+							
+							ConnectionPool pool = ConnectionPool.getInstance();
+							Connection connection = pool.getConnection();
+							UserDAOImpl.getInstance().followUser(subject, follower, connection);
+							pool.freeConnection(connection);
+							url = "/profile.jsp?username=" + subject.getUsername();
+						} else {
+							if (action.equals("unfollow")) {
+								User subject = (User)session.getAttribute("subject");
+								User follower = (User)session.getAttribute("user");
+								session.removeAttribute("subject");
+								
+								ConnectionPool pool = ConnectionPool.getInstance();
+								Connection connection = pool.getConnection();
+								UserDAOImpl.getInstance().unfollowUser(subject, follower, connection);
+								pool.freeConnection(connection);
+								url = "/profile.jsp?username=" + subject.getUsername();
+							}
+						}
 					}
 				}
 			}

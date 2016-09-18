@@ -12,13 +12,13 @@
 		} else {
 			ConnectionPool pool = ConnectionPool.getInstance();
 			Connection connection = pool.getConnection();
-			request.setAttribute("user",
+			session.setAttribute("subject",
 					UserDAOImpl.getInstance().selectUser((String) request.getParameter("username"), connection));
 			pool.freeConnection(connection);
 		}
 	%>
 
-	<c:if test="${requestScope.user == null}">
+	<c:if test="${subject == null}">
 		<c:redirect url="noSuchUser.jsp" />
 	</c:if>
 
@@ -38,31 +38,31 @@ td {
 }
 </style>
 
-	<h1>${requestScope.user}</h1>
+	<h1><c:out value="${subject.username}"></c:out></h1>
 
 
 	<c:set var="followed" value="false" />
-	<c:forEach var="follower" items="${requestScope.user.followers}">
-			<c:out value="Found him!" />
+	<c:forEach var="follower" items="${subject.followers}">
+		<c:if test="${follower.userId == sessionScope.user.userId}">
 			<c:set var="followed" value="true" />
+		</c:if>
 	</c:forEach>
 
-	<c:if test="${requestScope.user.username ne sessionScope.user.username}">
-		<c:if test="${followed == true}">
-			<form action="follow" method="get">
-				<input type="submit"
-					value=
-			<c:choose>
-    			<c:when test="${followed == true}">
-        			"Unfollow" 
-   				</c:when>    
-   				<c:otherwise>
-	        		"Follow" 
-    			</c:otherwise>
-    		</c:choose>
-					class="margin_left">
-			</form>
-		</c:if>
+	<c:if test="${subject.username ne sessionScope.user.username}">
+		<c:choose>
+    		<c:when test="${followed == true}">
+				<form action="home" method="post">
+					<input type="hidden" name="action" value="unfollow">
+					<input type="submit" value= "Unfollow" class="margin_left">
+				</form>
+			</c:when>    
+   			<c:otherwise>
+	        	<form action="home" method="post">
+					<input type="hidden" name="action" value="follow">
+					<input type="submit" value= "Follow" class="margin_left">
+				</form> 
+    		</c:otherwise>
+		</c:choose>
 	</c:if>
 
 	<h2>Posts</h2>
@@ -77,7 +77,7 @@ td {
 			<th>Text</th>
 		</tr>
 
-		<c:forEach var="post" items="${requestScope.user.userPosts}">
+		<c:forEach var="post" items="${subject.userPosts}">
 
 			<c:if test="${post == null}">
 				<p>

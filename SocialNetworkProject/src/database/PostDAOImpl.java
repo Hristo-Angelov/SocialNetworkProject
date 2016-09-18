@@ -324,8 +324,9 @@ public class PostDAOImpl implements PostDAO {
 		Set<Post> newsFeed = new TreeSet<Post>((p1, p2) -> p1.getDateWhenPosted().compareTo(p2.getDateWhenPosted()));
 
 		String followersQuery = "SELECT p.post_id FROM users u "
-				+ "LEFT OUTER JOIN followers f ON (f.subject_id = u.user_id) "
-				+ "JOIN posts p ON (p.user_id = f.follower_id) " + "WHERE u.user_id = " + user.getUserId();
+				+ "JOIN followers f ON (f.follower_id = u.user_id) "
+				+ "JOIN posts p ON (p.user_id = f.subject_id) "
+				+ "WHERE u.user_id =" + user.getUserId();
 
 		try (PreparedStatement ps = connection.prepareStatement(followersQuery); ResultSet rs = ps.executeQuery();) {
 
