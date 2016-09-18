@@ -39,7 +39,7 @@ public class UserController extends HttpServlet {
 		if (action == null) {
 			action = "home"; // default action
 		}
-
+		
 		// perform action and set URL to appropriate page
 		if (action.equals("home")) {
 			url = "/reglog.jsp"; // the "join" page
@@ -87,6 +87,11 @@ public class UserController extends HttpServlet {
 						url = "/login.jsp";
 						request.setAttribute("message", message);
 						request.setAttribute("user", user);
+					}
+				} else {
+					if (action.equals("logout")) {
+						url = "/reglog.jsp";
+						session.setAttribute("user", null);
 					}
 				}
 			}

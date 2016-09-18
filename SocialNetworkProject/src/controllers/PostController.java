@@ -40,8 +40,10 @@ public class PostController extends HttpServlet {
 
 		// get current action
 		String action = request.getParameter("action");
-		if (action == null) {
+		if (action == null && session.getAttribute("user") == null) {
 			action = "login"; // default action
+		} else {
+			action = "tweet";
 		}
 		
 		// perform action and set URL to appropriate page
