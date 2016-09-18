@@ -17,7 +17,9 @@ public interface PostDAO {
 	
 	public TreeSet<User> getLikes(Post post);
 
-	Post selectPost(int postId, Connection connection);
+	public Post selectPost(int postId, Connection connection);
+
+	
 	
 
  

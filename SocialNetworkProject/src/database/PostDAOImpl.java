@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 import com.mysql.jdbc.Util;
 
 import exceptions.InvalidInputException;
-import junit.framework.Assert;
+
 import socialnetwork.main.Hashtag;
 import socialnetwork.main.Post;
 import socialnetwork.main.PostType;
@@ -346,6 +346,25 @@ public class PostDAOImpl implements PostDAO {
 			pool.freeConnection(connection);
 		}
 		return likes;
+	}
+	public void deletePost(Post post){
+		Connection connection = pool.getConnection();
+		this.deletePost(post, connection);
+	}
+	
+	
+	
+	public void deletePost(Post post, Connection connection){
+		String sql = "DELETE FROM posts WHERE post_id = (?);";
+		try(PreparedStatement statement = connection.prepareStatement(sql);) {
+			statement.setInt(1, post.getPostId());
+			statement.executeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 }
