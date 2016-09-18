@@ -16,4 +16,8 @@
 	<a href="profile.jsp?username=${sessionScope.user.username}">
 		${sessionScope.user.username}
 	</a>
+	<form action="home" method="post">
+		<input type="hidden" name="action" value="logout">
+		<input type="submit" value="Log Out" class="margin_left">
+	</form>
 </c:if>

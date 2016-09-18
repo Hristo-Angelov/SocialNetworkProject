@@ -32,10 +32,10 @@ public class TestPostDAOModule {
 	public void postInsertionTest() throws InvalidInputException{
 		Post post = new Post();
 		User user  = new User();
-		user.setUserId(4);
+		user.setUserId(13);
 		post.setDateWhenPosted(LocalDateTime.now());
-		post.setPostId(4);
-		post.setText("test post #insertUnique #123");
+		post.setPostId(19);
+		post.setText("test post #kkk #insertUnique #123");
 		post.setPostType(PostType.REGULAR);
 		post.setPoster(user);
 		PostDAOImpl.getInstance().insertPost(post, DBTestConnection.getInstance().getConnection());

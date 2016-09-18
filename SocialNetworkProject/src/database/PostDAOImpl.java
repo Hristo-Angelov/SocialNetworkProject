@@ -74,19 +74,11 @@ public class PostDAOImpl implements PostDAO {
 	public void insertPost(Post post, Connection connection) {
 
 		PreparedStatement st = null;
-//		try {
-//			this.findHashtags(post, connection);
-//		} catch (InvalidInputException e1) {
-//
-//			e1.printStackTrace();
-//		}
-
 		String query = "INSERT INTO posts (user_id,text,original_post_id, post_type ,create_time) "
 				+ "VALUES (?,?,?,?,now())";
 		try {
-			st = connection.prepareStatement(query);
+			st = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
-//			 System.out.println("User: " + user.getUserId());
 			st.setInt(1, post.getPoster().getUserId());
 			st.setString(2, post.getText());
 			if (post.getOriginalPost() == null) {
@@ -97,6 +89,15 @@ public class PostDAOImpl implements PostDAO {
 			st.setInt(4, post.getPostType().ordinal());
 
 			st.executeUpdate();
+			ResultSet rs = st.getGeneratedKeys();
+			rs.next();
+			post.setPostId(rs.getInt(1));
+			try {
+				this.findHashtags(post, connection);
+			} catch (InvalidInputException e1) {
+
+				e1.printStackTrace();
+			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
