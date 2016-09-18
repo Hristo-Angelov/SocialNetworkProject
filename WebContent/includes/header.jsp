@@ -8,6 +8,7 @@
 	<meta charset="utf-8">
 	<title>Georgi and Hristo's cheap Twitter knock-off</title>
 	<link rel="stylesheet" href="styles/owl.theme.css" type="text/css" />
+	<link rel="stylesheet" href="styles/owl.theme.css" type="text/css" />
 </head>
 <body>
 <c:if test="${sessionScope.user != null}">
