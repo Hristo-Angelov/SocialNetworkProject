@@ -26,16 +26,16 @@ public class TestPostDAOModule {
 //	}
 	
 	
+//	
 	@Test
+	
 	public void postInsertionTest() throws InvalidInputException{
 		Post post = new Post();
 		User user  = new User();
 		user.setUserId(13);
 		post.setDateWhenPosted(LocalDateTime.now());
-
 		post.setPostId(4);
 		post.setText("test postjvhfdjkbhjfdb");
-
 		post.setPostType(PostType.REGULAR);
 		post.setPoster(user);
 		PostDAOImpl.getInstance().insertPost(post, DBTestConnection.getInstance().getConnection());
@@ -76,4 +76,10 @@ public class TestPostDAOModule {
 //		PostDAOImpl.getInstance().insertPost(post, DBTestConnection.getInstance().getConnection());
 //	}
 	
+	
+
+	private void assertNotNUll(Set<User> userLikes) {
+		// TODO Auto-generated method stub
+		
+	}
 }
