@@ -35,7 +35,7 @@ public class User implements IUser, Serializable, Comparable {
 
 	// automatically tracked user data
 	private List<Post> likedPosts = new ArrayList<Post>();
-	private List<Post> myPosts = new ArrayList<Post>();
+	private List<Post> userPosts = new ArrayList<Post>();
 	private Set<Post> newsfeed = new TreeSet<Post>();
 
 	private List<User> followers = new ArrayList<User>();
@@ -115,8 +115,8 @@ public class User implements IUser, Serializable, Comparable {
 		}
 	}
 
-	public List<Post> getMyPosts() {
-		return myPosts;
+	public List<Post> getUserPosts() {
+		return PostDAOImpl.getInstance().getUserPosts(this);
 	}
 
 

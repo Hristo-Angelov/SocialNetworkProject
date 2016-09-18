@@ -83,14 +83,6 @@ public class UserController extends HttpServlet {
 					if (message == null) {
 						url = "/newsfeed.jsp";
 						user = setUserToSession(session, user);
-						Set<Post> feed = PostDAOImpl.getInstance().getNewsfeed(user);
-//						Set<Post> feed = new TreeSet<Post>();
-						try {
-							feed.add(new Post("hi", user));
-						} catch (InvalidInputException e) {
-							e.printStackTrace();
-						}
-						request.setAttribute("feed", feed);
 					} else {
 						url = "/login.jsp";
 						request.setAttribute("message", message);

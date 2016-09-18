@@ -2,7 +2,7 @@
 <Context>
     <Resource name="jdbc/testdb" auth="Container" 
         driverClassName="com.mysql.jdbc.Driver" 
-        url="jdbc:mysql://localhost:3306/mydb" 
+        url="jdbc:mysql://localhost:3306/mydb?useSSL=false" 
         username="root" password="003131" 
         autoReconnect="true"
         maxActive="100" maxIdle="30" maxWait="10000" 

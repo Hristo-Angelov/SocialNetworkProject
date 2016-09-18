@@ -1,7 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"
     pageEncoding="utf-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<c:import url="/includes/header.html" />
+<c:import url="/includes/header.jsp" />
+
+<c:if test="${sessionScope.user != null}">
+	<c:redirect url="welcome"/>
+</c:if>
 
 <h1>Join our Twitter knock-off</h1>
 <p>To join, enter your name and

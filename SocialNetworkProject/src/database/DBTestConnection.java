@@ -9,6 +9,7 @@ public class DBTestConnection {
 
 	private Connection connection;
 
+	private static final String SSL_PARAMETER = "useSSL=false";
 	private static final String DB_SCHEMA = "mydb";
 	private static final String DB_PORT = "3306";
 	private static final String DB_HOST = "localhost";
@@ -17,7 +18,7 @@ public class DBTestConnection {
 
 	private DBTestConnection() throws Exception {
 		Class.forName("com.mysql.jdbc.Driver");
-		this.connection = DriverManager.getConnection("jdbc:mysql://" + DB_HOST + ":" + DB_PORT + "/" + DB_SCHEMA,
+		this.connection = DriverManager.getConnection("jdbc:mysql://" + DB_HOST + ":" + DB_PORT + "/" + DB_SCHEMA + "?" + SSL_PARAMETER,
 				DB_USERNAME, DB_PASSWORD);
 	}
 

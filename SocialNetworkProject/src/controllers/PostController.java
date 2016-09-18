@@ -34,7 +34,7 @@ public class PostController extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
-		String url = "/login.jsp";
+		String url = "/newsfeed.jsp";
 		
 		HttpSession session = request.getSession();
 
@@ -58,12 +58,11 @@ public class PostController extends HttpServlet {
 				post.setPoster(user);
 				post.setPostType(PostType.REGULAR);
 				if (PostValidation.validatePost(post, request.getSession())) {
-					url = "/thanks.jsp";
+					url = "/newsfeed.jsp";
 					PostDAO postDao = PostDAOImpl.getInstance();
 					postDao.insertPost(post);
 				} else {
-					url = "/registration.jsp";
-					request.setAttribute("post", post);					
+					url = "/newsfeed.jsp";
 				}
 			} 
 		}

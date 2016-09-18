@@ -7,8 +7,15 @@ import socialnetwork.main.Post;
 public class PostValidation {
 
 	public static boolean validatePost(Post post, HttpSession session) {
-		// TODO Auto-generated method stub
-		return true;
+		if (post != null && post.getText() != null && !post.getText().isEmpty()) {
+			if (session.getAttribute("user") != null) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 
 }
