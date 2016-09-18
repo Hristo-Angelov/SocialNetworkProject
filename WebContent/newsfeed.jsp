@@ -55,7 +55,11 @@ td 		{padding: 10px;}
 		<th></th>
 		<th></th>
 		<th></th>
-		<td><c:out value="${post.text}" /></td>
+		<td>
+		<a href="post.jsp?postId=${post.postId}">
+		<c:out value="${post.text}" />
+		</a>
+		</td>
 	</tr>
 </c:forEach>
 </table>
