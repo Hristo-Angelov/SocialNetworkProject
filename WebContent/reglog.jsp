@@ -7,6 +7,7 @@
 <c:if test="${sessionScope.user != null}">
 	<c:redirect url="welcome" />
 </c:if>
+<center>
 
 <h1>Join our Twitter knock-off</h1>
 <p>To join, enter your name and email address below.</p>
@@ -32,5 +33,5 @@
 		name="password"><br> <label>&nbsp;</label> <input
 		type="submit" value="Log in" class="margin_left">
 </form>
-
+</center>
 <c:import url="/includes/footer.jsp" />

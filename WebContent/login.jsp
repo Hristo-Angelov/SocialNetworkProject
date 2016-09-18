@@ -7,7 +7,9 @@
 	<c:redirect url="welcome" />
 </c:if>
 <center>
-	<h1>Login to our Twitter knock-off</h1>
+	<h1>Login to our </h1>
+	<img src= "resources/logo.png" width="200"
+	 height="200" align="top"/>
 	<p>Enter your username and password below.</p>
 	<c:if test="${message != null}">
 		<i>${message}</i>
