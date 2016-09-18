@@ -132,7 +132,7 @@ public class PostDAOImpl implements PostDAO {
 			post.setDateWhenPosted(rs.getTimestamp("create_time").toLocalDateTime());
 			post.setPostId(postId);
 			post.setText(rs.getString("text"));
-			post.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id"), DBTestConnection.getInstance().getConnection()));
+			post.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id"), connection));
 			post.setPostType(PostType.fromInt(postType));
 			if (postType != 0) {
 				post.setOriginalPost(selectPost(originalPostId, connection));

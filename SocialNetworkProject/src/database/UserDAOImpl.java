@@ -174,7 +174,6 @@ public class UserDAOImpl implements UserDAO {
 			return null;
 		} finally {
 			DBUtil.closePreparedStatement(ps);
-			pool.freeConnection(connection);
 		}
 	}
 	

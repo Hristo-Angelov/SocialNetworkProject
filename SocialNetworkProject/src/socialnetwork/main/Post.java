@@ -285,8 +285,10 @@ public class Post implements Comparable<Post>{
 		return poster;
 	}
 
-	public LocalDateTime getDateWhenPosted() {
-		return dateWhenPosted;
+	public String getDateWhenPosted() {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+		String formattedDateTime = this.dateWhenPosted.format(formatter);
+		return formattedDateTime;
 	}
 
 	public List<Post> getAnswers() {
@@ -328,7 +330,6 @@ public class Post implements Comparable<Post>{
 
 	@Override
 	public int compareTo(Post o) {
-		
 		return this.getDateWhenPosted().compareTo(o.getDateWhenPosted());
 	}
 
