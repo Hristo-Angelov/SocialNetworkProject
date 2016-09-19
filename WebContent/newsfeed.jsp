@@ -58,6 +58,13 @@ td 		{padding: 10px;}
 		<a href="post.jsp?postId=${post.postId}">
 		<c:out value="${post.text}" />
 		</a>
+		
+<form action="welcome" method="addTweet">
+	<input type="hidden" name="action" value="tweet"> <input
+		type="text" name="retweet" placeholder="Write your retweet here?"
+		value="${retweet.text}" autofocus><br> <label>&nbsp;</label>
+	<input type="submit" value="Retweet" class="margin_left">
+</form>
 		</td>
 	</tr>
 </c:forEach>

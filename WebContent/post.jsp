@@ -89,7 +89,7 @@
 		<td>
 		<a href="post.jsp?postId=${retweet.postId}">
 		<c:out value="${retweet.text}" />
-		<button type="button" onclick="location = 'login.jsp'">Save</button>
+		<button type="button" onclick="location = ">Like</button>
 		</a>
 		</td>
 	</tr>
