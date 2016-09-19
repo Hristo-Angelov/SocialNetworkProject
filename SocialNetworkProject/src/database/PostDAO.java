@@ -40,9 +40,9 @@ public interface PostDAO {
 
 	List<Post> getRetweets(Post op, Connection connection);
 
-	void addLike(Post post, User user, Connection conn);
+	void addLike(int postId, User user, Connection conn);
 
-	void removeLike(Post post, User user, Connection conn);
+	void removeLike(int postId, User user, Connection conn);
 
 	
 	

@@ -7,6 +7,25 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <c:import url="/includes/header.jsp" />
+<style>
+table {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 100%;
+	padding: 30px;
+}
+
+a {
+	color: blue;
+}
+
+td {
+	padding: 10px;
+}
+
+form {
+	display: inline-block;
+}
+</style>
 <center>
 	<%
 		if (request.getParameter("username") == null) {
@@ -73,11 +92,7 @@ td {
 	<table>
 		<tr>
 			<th>User</th>
-			<th></th>
 			<th>Posted on</th>
-			<th></th>
-			<th></th>
-			<th></th>
 			<th>Text</th>
 		</tr>
 
@@ -94,13 +109,8 @@ td {
 						<c:out value="${post.poster.username}" />
 				</a></td>
 
-				<th></th>
 				<td><c:out value="${post.dateWhenPosted}" /></td>
 
-
-				<th></th>
-				<th></th>
-				<th></th>
 				<td><c:out value="${post.text}" /> <br>
 					<form action="retweet.jsp?originalPostId=${post.postId}"
 						method="post">
@@ -111,7 +121,34 @@ td {
 						method="post">
 						<input type="submit" value="Reply (${fn:length(post.replies)})"
 							class="margin_left">
-					</form></td>
+					</form>
+
+				<c:forEach var="liker" items="${post.likes}">
+					<c:if test="${liker.userId == sessionScope.user.userId}">
+						<c:set var="liked" value="true" />
+					</c:if>
+				</c:forEach>
+				<c:forEach var="liker" items="${post.likes}">
+		<c:if test="${liker.userId == sessionScope.user.userId}">
+			<c:set var="liked" value="true" />
+		</c:if>
+	</c:forEach>
+
+		<c:choose>
+			<c:when test="${liked != true}">
+				<form action="like.jsp?postId=${post.postId}" method="post">
+					<input type="hidden" name="action" value="like">
+					<input type="submit" value="Like (${fn:length(post.likes)})" class="margin_left">
+				</form>
+			</c:when>
+			<c:otherwise>
+			<form action="like.jsp?postId=${post.postId}" method="post">
+				<input type="hidden" name="action" value="unlike">
+				<input type="submit" value="Unlike (${fn:length(post.likes)})" class="margin_left">
+			</form>
+			</c:otherwise>
+		</c:choose>
+				</td>
 			</tr>
 		</c:forEach>
 	</table>

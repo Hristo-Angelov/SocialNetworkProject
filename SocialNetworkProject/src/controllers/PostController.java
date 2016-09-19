@@ -63,11 +63,12 @@ public class PostController extends HttpServlet {
 				this.addTweet(request, session, PostType.REGULAR);
 			} else {
 				Post originalPost = (Post)session.getAttribute("originalPost");
-				url = "/post.jsp?postId=" + originalPost.getPostId();
 				if (action.equals("retweet")) {
+					url = "/post.jsp?postId=" + originalPost.getPostId();
 					this.addTweet(request, session, PostType.RETWEET, originalPost);
 				} else {
 					if (action.equals("reply")) {
+						url = "/post.jsp?postId=" + originalPost.getPostId();
 						this.addTweet(request, session, PostType.ANSWER, originalPost);
 					} 
 				}

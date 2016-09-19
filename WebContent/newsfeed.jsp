@@ -56,11 +56,27 @@ form	{display: inline-block;}
 		<form action="reply.jsp?originalPostId=${post.postId}" method="post">
 			<input type="submit" value="Reply (${fn:length(post.replies)})" class="margin_left">
 		</form>
-		<form action="like" method="post">
-			<c:set var="originalPost" value="${post}" scope="session"/>
-			<c:set var="action" value="like" scope="session"/>
-			<input type="submit" value="Like (${fn:length(post.likes)})" class="margin_left">
-		</form>
+		<c:set var="liked" value="false" />
+	<c:forEach var="liker" items="${post.likes}">
+		<c:if test="${liker.userId == sessionScope.user.userId}">
+			<c:set var="liked" value="true" />
+		</c:if>
+	</c:forEach>
+
+		<c:choose>
+			<c:when test="${liked != true}">
+				<form action="like.jsp?postId=${post.postId}" method="post">
+					<input type="hidden" name="action" value="like">
+					<input type="submit" value="Like (${fn:length(post.likes)})" class="margin_left">
+				</form>
+			</c:when>
+			<c:otherwise>
+			<form action="like.jsp?postId=${post.postId}" method="post">
+				<input type="hidden" name="action" value="unlike">
+				<input type="submit" value="Unlike (${fn:length(post.likes)})" class="margin_left">
+			</form>
+			</c:otherwise>
+		</c:choose>
 		</td>
 	</tr>
 
