@@ -58,7 +58,7 @@ form	{display: inline-block;}
 </table>
 <form action="welcome" method="post">
 	<input type="hidden" name="action" value="retweet"> 
-	<input type="text" name="tweet" placeholder="Add a comment..." autofocus> 
+	<input type="text" name="tweet" placeholder="Add a comment..." autofocus maxlength="140"> 
 	<input type="submit" value="Retweet" class="margin_left"><br>
 </form>
 </center>

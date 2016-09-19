@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"
 	pageEncoding="utf-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <c:import url="/includes/header.jsp" />
 <center>
 <style>
@@ -19,7 +20,7 @@ form	{display: inline-block;}
 <form action="welcome" method="post">
 	<input type="hidden" name="action" value="tweet"> <input
 		type="text" name="tweet" placeholder="What's happening?"
-		value="${post.text}" autofocus><br> <label>&nbsp;</label>
+		value="${post.text}" autofocus maxlength="140"><br> <label>&nbsp;</label>
 	<input type="submit" value="Tweet" class="margin_left">
 </form>
 
@@ -50,13 +51,13 @@ form	{display: inline-block;}
 		</a>
 		<br>
 		<form action="retweet.jsp?originalPostId=${post.postId}" method="post">
-			<input type="submit" value="Retweet" class="margin_left">
+			<input type="submit" value="Retweet (${fn:length(post.retweets)})" class="margin_left">
 		</form>
 		<form action="reply.jsp?originalPostId=${post.postId}" method="post">
-			<input type="submit" value="Reply" class="margin_left">
+			<input type="submit" value="Reply (${fn:length(post.replies)})" class="margin_left">
 		</form>
 		<form action="welcome" method="post">
-			<input type="submit" value="Like" class="margin_left">
+			<input type="submit" value="Like (${fn:length(post.likes)})" class="margin_left">
 		</form>
 		</td>
 	</tr>

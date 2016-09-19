@@ -58,7 +58,7 @@ form	{display: inline-block;}
 </table>
 <form action="welcome" method="post">
 	<input type="hidden" name="action" value="reply"> 
-	<input type="text" name="tweet" placeholder="Add a reply..." value="@${originalPost.poster.username} " autofocus> 
+	<input type="text" name="tweet" placeholder="Add a reply..." value="@${originalPost.poster.username} " autofocus maxlength="140"> 
 	<input type="submit" value="Reply" class="margin_left"><br>
 </form>
 </center>
