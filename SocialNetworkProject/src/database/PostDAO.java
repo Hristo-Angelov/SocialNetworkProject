@@ -36,9 +36,9 @@ public interface PostDAO {
 
 	List<Post> getNewsfeed(User user, Connection connection);
 
-	Set<Post> getReplies(Post post, Connection connection);
+	List<Post> getReplies(Post post, Connection connection);
 
-	Set<Post> getRetweets(Post op, Connection connection);
+	List<Post> getRetweets(Post op, Connection connection);
 
 	
 	

@@ -158,8 +158,8 @@ public class PostDAOImpl implements PostDAO {
 	// }
 
 	@Override
-	public Set<Post> getRetweets(Post post, Connection connection) {
-		Set<Post> retweets = new HashSet<Post>();
+	public List<Post> getRetweets(Post post, Connection connection) {
+		List<Post> retweets = new ArrayList<Post>();
 		String retweetQuery = "SELECT a.* FROM posts p " 
 					+ "JOIN posts a ON p.post_id = a.original_post_id "
 					+ "WHERE a.post_type = 2 AND a.original_post_id = " + post.getPostId();
@@ -167,12 +167,15 @@ public class PostDAOImpl implements PostDAO {
 
 			while (rs.next()) {
 				Post newPost = new Post();
+				newPost.setPostId(rs.getInt("post_id"));
 				newPost.setText(rs.getString("text"));
 				newPost.setDateWhenPosted(rs.getTimestamp("create_time").toLocalDateTime());
 				newPost.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id"), connection));
 				retweets.add(newPost);
 			}
-
+			retweets.sort((p2, p1) -> p1.getDateWhenPosted().compareTo(p2.getDateWhenPosted()));
+			post.setRetweets(retweets);
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -187,8 +190,8 @@ public class PostDAOImpl implements PostDAO {
 	// }
 
 	@Override
-	public Set<Post> getReplies(Post post, Connection connection) {
-		Set<Post> answers = new HashSet<Post>();
+	public List<Post> getReplies(Post post, Connection connection) {
+		List<Post> answers = new ArrayList<Post>();
 
 		String answerQuery = "SELECT a.* FROM posts p " 
 				+ "JOIN posts a ON p.post_id = a.original_post_id "
@@ -199,11 +202,13 @@ public class PostDAOImpl implements PostDAO {
 			rs = ps.executeQuery(answerQuery);
 			while (rs.next()) {
 				Post newPost = new Post();
+				newPost.setPostId(rs.getInt("post_id"));
 				newPost.setText(rs.getString("text"));
 				newPost.setDateWhenPosted(rs.getTimestamp("create_time").toLocalDateTime());
 				newPost.setPoster(UserDAOImpl.getInstance().selectUser(rs.getInt("user_id"), connection));
 				answers.add(newPost);
 			}
+			answers.sort((p2, p1) -> p1.getDateWhenPosted().compareTo(p2.getDateWhenPosted()));
 			post.setReplies(answers);
 
 		} catch (SQLException e) {
@@ -237,6 +242,7 @@ public class PostDAOImpl implements PostDAO {
 				posts.add(post);
 
 			}
+			posts.sort((p1, p2) -> p1.compareTo(p2));
 			return posts;
 
 		} catch (SQLException e) {

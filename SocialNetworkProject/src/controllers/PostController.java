@@ -25,29 +25,31 @@ public class PostController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		doPost(request, response);
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
 		String url = "/newsfeed.jsp";
-		
+
 		HttpSession session = request.getSession();
 
 		// get current action
 		String action = request.getParameter("action");
-		if (action == null && session.getAttribute("user") == null) {
+		if (action == null || session.getAttribute("user") == null) {
 			action = "login"; // default action
-		} else {
-			action = "tweet";
 		}
-		
+
 		// perform action and set URL to appropriate page
 		if (action.equals("login")) {
 			url = "/login.jsp"; // the "join" page
@@ -57,11 +59,13 @@ public class PostController extends HttpServlet {
 			if (action.equals("tweet")) {
 				this.addTweet(request, session, PostType.REGULAR);
 			} else {
+				int originalPostId = (int) session.getAttribute("originalPostId");
+				Post originalPost = (Post)session.getAttribute("originalPost");
 				if (action.equals("retweet")) {
-					this.addTweet(request, session, PostType.RETWEET);
+					this.addTweet(request, session, PostType.RETWEET, originalPost);
 				} else {
 					if (action.equals("reply")) {
-						this.addTweet(request, session, PostType.ANSWER);
+						this.addTweet(request, session, PostType.ANSWER, originalPost);
 					}
 				}
 			}
@@ -72,6 +76,10 @@ public class PostController extends HttpServlet {
 	}
 
 	private void addTweet(HttpServletRequest request, HttpSession session, PostType postType) {
+		this.addTweet(request, session, postType, null);
+	}
+
+	private void addTweet(HttpServletRequest request, HttpSession session, PostType postType, Post originalPost) {
 		// get parameters from the request
 		String text = request.getParameter("tweet");
 		User user = (User) session.getAttribute("user");
@@ -83,6 +91,7 @@ public class PostController extends HttpServlet {
 			PostDAO postDao = PostDAOImpl.getInstance();
 			ConnectionPool pool = ConnectionPool.getInstance();
 			Connection connection = pool.getConnection();
+			post.setOriginalPost(originalPost);
 			postDao.insertPost(post, connection);
 			pool.freeConnection(connection);
 		}

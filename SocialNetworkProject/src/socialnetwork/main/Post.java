@@ -40,7 +40,7 @@ public class Post implements Comparable<Post>{
 
 	private Set<User> likes = new TreeSet<User>((u1,u2) -> u1.getUsername().compareTo(u2.getUsername()));
 
-	private Set<Post> replies = new TreeSet<Post>((r1,r2) -> r2.getDateWhenPosted().compareTo(r1.getDateWhenPosted()));
+	private List<Post> replies = new ArrayList<>();
 	
 	public Set<Post> getNewRetweets() {
 		return newRetweets;
@@ -73,10 +73,10 @@ public class Post implements Comparable<Post>{
 		this.postId = Post.idCounter;
 	}
 
-	public Set<Post> getReplies() {
+	public List<Post> getReplies() {
 		ConnectionPool pool = ConnectionPool.getInstance();
 		Connection connection = pool.getConnection();
-		Set<Post> reps =PostDAOImpl.getInstance().getReplies(this,connection) ;
+		List<Post> reps = PostDAOImpl.getInstance().getReplies(this,connection) ;
 		pool.freeConnection(connection);
 		this.replies = reps;
 		return reps;
@@ -333,6 +333,11 @@ public class Post implements Comparable<Post>{
 	}
 
 	public List<Post> getRetweets() {
+		ConnectionPool pool = ConnectionPool.getInstance();
+		Connection connection = pool.getConnection();
+		List<Post> retweets = PostDAOImpl.getInstance().getRetweets(this,connection) ;
+		pool.freeConnection(connection);
+		this.retweets = retweets;
 		return retweets;
 	}
 
@@ -340,7 +345,7 @@ public class Post implements Comparable<Post>{
 		this.retweets = retweets;
 	}
 
-	public void setReplies(Set<Post> replies) {
+	public void setReplies(List<Post> replies) {
 		this.replies = replies;
 	}
 

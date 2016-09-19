@@ -1,4 +1,4 @@
-<%@page import="database.PostDAOImpl"%>
+<%@ page import="database.PostDAOImpl"%>
 <%@ page import="database.UserDAOImpl"%>
 <%@ page import="database.ConnectionPool"%>
 <%@ page import="java.sql.Connection"%>
@@ -37,13 +37,7 @@
 				
 			</a>
 		</td>
-		
-		<th></th>
 		<td><c:out value="${post.dateWhenPosted}" /></td>
-		
-		<th></th>
-		<th></th>
-		<th></th>
 		<td>
 		<a href="post.jsp?postId=${post.postId}">
 		<c:out value="${post.text}" />
@@ -52,27 +46,21 @@
 	</tr>
 </table>
 
-	
 <table>
 
 <tr>
 		<th>User</th>
-		<th></th>
 		<th>Posted on</th>
-		<th></th>
-		<th></th>
-		<th></th>
-		<th>Text</th>
+		<th>Retweets</th>
 </tr>
 
 
 <c:forEach var="retweet" items="${post.retweets}">
 	<c:if test="${retweet == null}">
 		<p>
-			<i>No Posts</i>
+			<i>No retweets</i>
 		</p>
 	</c:if>
-	<br>
 	<tr>
 		<td>
 			<a href="profile.jsp?username=${retweet.poster.username}"> 
@@ -80,39 +68,30 @@
 			</a>
 		</td>
 		
-		<th></th>
 		<td><c:out value="${retweet.dateWhenPosted}" /></td>
 		
-		<th></th>
-		<th></th>
-		<th></th>
 		<td>
 		<a href="post.jsp?postId=${retweet.postId}">
 		<c:out value="${retweet.text}" />
-		<button type="button" onclick="location = ">Like</button>
 		</a>
 		</td>
 	</tr>
 </c:forEach>
 </table>
+
 <table>
 <tr>
 		<th>User</th>
-		<th></th>
 		<th>Posted on</th>
-		<th></th>
-		<th></th>
-		<th></th>
-		<th>Text</th>
+		<th>Replies</th>
 </tr>
 
 <c:forEach var="reply" items="${post.replies}">
 	<c:if test="${reply == null}">
 		<p>
-			<i>No Posts</i>
+			<i>No replies</i>
 		</p>
 	</c:if>
-	<br>
 	<tr>
 		<td>
 			<a href="profile.jsp?username=${reply.poster.username}"> 
@@ -120,12 +99,8 @@
 			</a>
 		</td>
 		
-		<th></th>
 		<td><c:out value="${reply.dateWhenPosted}" /></td>
 		
-		<th></th>
-		<th></th>
-		<th></th>
 		<td>
 		<a href="post.jsp?postId=${reply.postId}">
 		<c:out value="${reply.text}" />
@@ -133,14 +108,7 @@
 		</td>
 	</tr>
 </c:forEach>
-
-<c:if test="${reply == null && retweet == null}">
-	<c:redirect url="noSuchPost.jsp" />
-</c:if>
-
-
 </table>
-
 
 </center>
 <c:import url="/includes/footer.jsp" />
