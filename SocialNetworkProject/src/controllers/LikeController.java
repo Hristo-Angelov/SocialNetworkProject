@@ -11,17 +11,15 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import database.ConnectionPool;
-import database.PostDAO;
 import database.PostDAOImpl;
 import socialnetwork.main.Post;
-import socialnetwork.main.PostType;
 import socialnetwork.main.User;
 
 /**
- * Servlet implementation class PostController
+ * Servlet implementation class LikeController
  */
-@WebServlet("/welcome")
-public class PostController extends HttpServlet {
+@WebServlet("/like")
+public class LikeController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -45,60 +43,52 @@ public class PostController extends HttpServlet {
 		HttpSession session = request.getSession();
 
 		// get current action
-		String action = request.getParameter("action");
+		String action = (String) session.getAttribute("action");
 		if (action == null) {
 			action = "default";
 		}
 		if (session.getAttribute("user") == null) {
 			action = "login";
 		}
-
 		// perform action and set URL to appropriate page
 		if (action.equals("login")) {
 			url = "/login.jsp"; // the "join" page
 			request.setAttribute("message", "You are not logged in.");
 		} else {
-			if (action.equals("tweet")) {
-				url = "/newsfeed.jsp";
-				this.addTweet(request, session, PostType.REGULAR);
-			} else {
+			if (action.equals("like")) {
 				Post originalPost = (Post)session.getAttribute("originalPost");
 				url = "/post.jsp?postId=" + originalPost.getPostId();
-				if (action.equals("retweet")) {
-					this.addTweet(request, session, PostType.RETWEET, originalPost);
-				} else {
-					if (action.equals("reply")) {
-						this.addTweet(request, session, PostType.ANSWER, originalPost);
-					} 
-				}
+				this.like(session);
 				session.removeAttribute("originalPost");
+			} else {
+				if (action.equals("unlike")) {
+					Post originalPost = (Post)session.getAttribute("originalPost");
+					url = "/post.jsp?postId=" + originalPost.getPostId();
+					this.unlike(session);
+					session.removeAttribute("originalPost");
+				}
 			}
 		}
-
+		session.removeAttribute("action");
 		getServletContext().getRequestDispatcher(url).forward(request, response);
-
 	}
 
-	private void addTweet(HttpServletRequest request, HttpSession session, PostType postType) {
-		this.addTweet(request, session, postType, null);
+	private void unlike(HttpSession session) {
+		Post post = (Post)session.getAttribute("originalPost");
+		User user = (User)session.getAttribute("user");
+		ConnectionPool pool = ConnectionPool.getInstance();
+		Connection connection = pool.getConnection();
+		PostDAOImpl.getInstance().addLike(post, user, connection);
+		pool.freeConnection(connection);
 	}
 
-	private void addTweet(HttpServletRequest request, HttpSession session, PostType postType, Post originalPost) {
-		// get parameters from the request
-		String text = request.getParameter("tweet");
-		User user = (User) session.getAttribute("user");
-		Post post = new Post();
-		post.setText(text);
-		post.setPoster(user);
-		post.setPostType(postType);
-		if (PostValidation.validatePost(post, request.getSession())) {
-			PostDAO postDao = PostDAOImpl.getInstance();
-			ConnectionPool pool = ConnectionPool.getInstance();
-			Connection connection = pool.getConnection();
-			post.setOriginalPost(originalPost);
-			postDao.insertPost(post, connection);
-			pool.freeConnection(connection);
-		}
+	private void like(HttpSession session) {
+		Post post = (Post)session.getAttribute("originalPost");
+		User user = (User)session.getAttribute("user");
+		ConnectionPool pool = ConnectionPool.getInstance();
+		Connection connection = pool.getConnection();
+		PostDAOImpl.getInstance().addLike(post, user, connection);
+		pool.freeConnection(connection);
 	}
 
 }

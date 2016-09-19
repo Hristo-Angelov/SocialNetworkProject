@@ -5,6 +5,7 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"
 	pageEncoding="utf-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <c:import url="/includes/header.jsp" />
 <center>
 	<%
@@ -39,7 +40,9 @@ td {
 }
 </style>
 
-	<h1><c:out value="${subject.username}"></c:out></h1>
+	<h1>
+		<c:out value="${subject.username}"></c:out>
+	</h1>
 
 
 	<c:set var="followed" value="false" />
@@ -51,18 +54,18 @@ td {
 
 	<c:if test="${subject.username ne sessionScope.user.username}">
 		<c:choose>
-    		<c:when test="${followed == true}">
+			<c:when test="${followed == true}">
 				<form action="home" method="post">
-					<input type="hidden" name="action" value="unfollow">
-					<input type="submit" value= "Unfollow" class="margin_left">
+					<input type="hidden" name="action" value="unfollow"> <input
+						type="submit" value="Unfollow" class="margin_left">
 				</form>
-			</c:when>    
-   			<c:otherwise>
-	        	<form action="home" method="post">
-					<input type="hidden" name="action" value="follow">
-					<input type="submit" value= "Follow" class="margin_left">
-				</form> 
-    		</c:otherwise>
+			</c:when>
+			<c:otherwise>
+				<form action="home" method="post">
+					<input type="hidden" name="action" value="follow"> <input
+						type="submit" value="Follow" class="margin_left">
+				</form>
+			</c:otherwise>
 		</c:choose>
 	</c:if>
 
@@ -98,7 +101,17 @@ td {
 				<th></th>
 				<th></th>
 				<th></th>
-				<td><c:out value="${post.text}" /></td>
+				<td><c:out value="${post.text}" /> <br>
+					<form action="retweet.jsp?originalPostId=${post.postId}"
+						method="post">
+						<input type="submit" value="Retweet (${fn:length(post.retweets)})"
+							class="margin_left">
+					</form>
+					<form action="reply.jsp?originalPostId=${post.postId}"
+						method="post">
+						<input type="submit" value="Reply (${fn:length(post.replies)})"
+							class="margin_left">
+					</form></td>
 			</tr>
 		</c:forEach>
 	</table>

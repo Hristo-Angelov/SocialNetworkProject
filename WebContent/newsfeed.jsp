@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"
 	pageEncoding="utf-8"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <c:import url="/includes/header.jsp" />
 <center>
@@ -56,7 +56,9 @@ form	{display: inline-block;}
 		<form action="reply.jsp?originalPostId=${post.postId}" method="post">
 			<input type="submit" value="Reply (${fn:length(post.replies)})" class="margin_left">
 		</form>
-		<form action="welcome" method="post">
+		<form action="like" method="post">
+			<c:set var="originalPost" value="${post}" scope="session"/>
+			<c:set var="action" value="like" scope="session"/>
 			<input type="submit" value="Like (${fn:length(post.likes)})" class="margin_left">
 		</form>
 		</td>

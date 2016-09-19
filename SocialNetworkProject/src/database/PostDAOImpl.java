@@ -45,19 +45,35 @@ public class PostDAOImpl implements PostDAO {
 	// this.addLike(post, user, conn);
 	// }
 
-	public void addLike(Post post, User user, Connection conn) {
+	@Override
+	public void addLike(Post post, User user, Connection connection) {
 
 		String insertLikeSql = "INSERT INTO likes VALUES (?,?)";
 
-		try (PreparedStatement statement = conn.prepareStatement(insertLikeSql);) {
+		try (PreparedStatement statement = connection.prepareStatement(insertLikeSql);) {
 			statement.setInt(1, post.getPostId());
 			statement.setInt(2, user.getUserId());
 			statement.executeUpdate();
 		} catch (SQLException e) {
-
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	public void removeLike(Post post, User user, Connection connection) {
 
+		String removeLikeSql = "DELETE FROM likes "
+						+ "WHERE (post = " + post.getPostId()
+						+ ") AND (user_number = " + user.getUserId()
+						+ ");";
+		Statement statement = null;
+		
+		try {
+			statement = connection.createStatement();
+			statement.executeUpdate(removeLikeSql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	// @Override
