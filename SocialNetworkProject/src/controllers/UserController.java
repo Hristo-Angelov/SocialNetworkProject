@@ -91,7 +91,7 @@ public class UserController extends HttpServlet {
 				} else {
 					if (action.equals("logout")) {
 						url = "/reglog.jsp";
-						session.setAttribute("user", null);
+						session.removeAttribute("user");
 					} else {
 						if (action.equals("follow")) {
 							User subject = (User)session.getAttribute("subject");

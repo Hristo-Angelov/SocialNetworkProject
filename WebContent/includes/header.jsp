@@ -26,9 +26,14 @@
 		${sessionScope.user.username}
 	</a>
 	</p>
-
 	</li>
-	
-</c:if>
+	<li >
+	<p style="align: right;">
+	<a href="home?action=logout">
+		Log out
+	</a>
+	</p>
+	</li>
+	</c:if>
 </ul>
 
