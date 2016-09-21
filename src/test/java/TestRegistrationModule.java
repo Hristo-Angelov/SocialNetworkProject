@@ -1,4 +1,5 @@
 import java.sql.Connection;
+import java.util.Random;
 
 import org.junit.Test;
 
@@ -11,6 +12,6 @@ public class TestRegistrationModule {
 	@Test
 	public void TestRegistration() {
 		Connection connection = DBTestConnection.getInstance().getConnection();
-		UserDAOImpl.getInstance().insertUser(new User("JackSmack", "VoteTrump", "kony2012@gmail.com"), connection);
+		UserDAOImpl.getInstance().insertUser(new User("JackSmack" + new Random().nextInt(), "VoteTrump", "kony2012@gmail.com" + new Random().nextInt()), connection);
 	}
 }

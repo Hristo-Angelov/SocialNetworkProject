@@ -65,13 +65,15 @@ form	{display: inline-block;}
 
 		<c:choose>
 			<c:when test="${liked != true}">
-				<form action="like.jsp?postId=${post.postId}" method="post">
+				<form action="likes" method="post">
+					<input type="hidden" name="postId" value="${post.postId}">
 					<input type="hidden" name="action" value="like">
 					<input type="submit" value="Like (${fn:length(post.likes)})" class="margin_left">
 				</form>
 			</c:when>
 			<c:otherwise>
-			<form action="like.jsp?postId=${post.postId}" method="post">
+			<form action="likes" method="post">
+				<input type="hidden" name="postId" value="${post.postId}">
 				<input type="hidden" name="action" value="unlike">
 				<input type="submit" value="Unlike (${fn:length(post.likes)})" class="margin_left">
 			</form>

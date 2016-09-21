@@ -23,11 +23,6 @@ public class UserDAOImpl implements UserDAO {
 		}
 		return userDao;
 	}
-
-//	public boolean isUsernameAvailable(String username) {
-//		Connection connection = pool.getConnection();
-//		return isUsernameAvailable(username, connection);
-//	}
 	
 	@Override
 	public boolean isUsernameAvailable(String username, Connection connection) {
@@ -50,11 +45,6 @@ public class UserDAOImpl implements UserDAO {
 		}
 	}
 
-//	public boolean isEmailAvailable(String email) {
-//		Connection connection = pool.getConnection();
-//		return isEmailAvailable(email, connection);
-//	}
-	
 	@Override
 	public boolean isEmailAvailable(String email, Connection connection) {
 		PreparedStatement ps = null;
@@ -76,11 +66,6 @@ public class UserDAOImpl implements UserDAO {
 		}
 	}
 
-//	public void insertUser(User user) {
-//		Connection connection = pool.getConnection();
-//		insertUser(user, connection);
-//	}
-
 	@Override
 	public void insertUser(User user, Connection connection) {
 		PreparedStatement ps = null;
@@ -100,20 +85,6 @@ public class UserDAOImpl implements UserDAO {
 		}
 	}
 	
-	public void updateUser(User user) {
-		// TODO
-	}
-
-	public void removeUser(User user) {
-		// TODO
-	}
-
-//	@Override
-//	public User selectUser(String username) {
-//		Connection connection = pool.getConnection();
-//		return selectUser(username, connection);
-//	}
-
 	@Override
 	public User selectUser(String username, Connection connection) {
 		PreparedStatement ps = null;
@@ -145,12 +116,6 @@ public class UserDAOImpl implements UserDAO {
 		}
 	}
 	
-//	@Override
-//	public User selectUser(int userID) {
-//		Connection connection = pool.getConnection();
-//		return selectUser(userID, connection);
-//	}
-
 	@Override
 	public User selectUser(int userID, Connection connection) {
 		PreparedStatement ps = null;
@@ -181,22 +146,11 @@ public class UserDAOImpl implements UserDAO {
 		}
 	}
 	
-//	@Override
-//	public String getUserPasswordHash(String username) {
-//		String pass = selectUser(username).getPassword().trim();
-//		return pass;
-//	}
-	
 	@Override
 	public String getUserPasswordHash(String username, Connection connection) {
 		String pass = selectUser(username, connection).getPassword().trim();
 		return pass;
 	}
-	
-//	@Override
-//	public List<User> getFollowers(int userId) {
-//		return getFollowers(userId, pool.getConnection());
-//	}
 	
 	@Override
 	public List<User> getFollowers(int userId, Connection connection) {
@@ -256,7 +210,6 @@ public class UserDAOImpl implements UserDAO {
 			ps.setInt(2, follower.getUserId());
 			ps.executeUpdate();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
 			DBUtil.closePreparedStatement(ps);

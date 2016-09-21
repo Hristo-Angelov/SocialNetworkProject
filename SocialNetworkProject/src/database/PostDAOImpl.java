@@ -40,11 +40,6 @@ public class PostDAOImpl implements PostDAO {
 		return postDao;
 	}
 
-	// public void addLike(Post post, User user) {
-	// Connection conn = pool.getConnection();
-	// this.addLike(post, user, conn);
-	// }
-
 	@Override
 	public void addLike(int postId, User user, Connection connection) {
 
@@ -75,13 +70,6 @@ public class PostDAOImpl implements PostDAO {
 			e.printStackTrace();
 		}
 	}
-
-	// @Override
-	// public void insertPost(Post post) {
-	// Connection connection = pool.getConnection();
-	// this.insertPost(post, connection);
-	//
-	// }
 
 	@Override
 	public void insertPost(Post post, Connection connection) {
@@ -122,13 +110,6 @@ public class PostDAOImpl implements PostDAO {
 
 	}
 
-	// @Override
-	// public Post selectPost(int postId) {
-	// Connection connection = pool.getConnection();
-	// Post post = this.selectPost(postId, connection);
-	// return post;
-	// }
-
 	@Override
 	public Post selectPost(int postId, Connection connection) {
 		Post post = null;
@@ -167,12 +148,6 @@ public class PostDAOImpl implements PostDAO {
 		return post;
 	}
 
-	// public Set<Retweet> getRetweets(Post post) {
-	// Connection connection = pool.getConnection();
-	// Set<Retweet> retweets = this.getRetweets(post);
-	// return retweets;
-	// }
-
 	@Override
 	public List<Post> getRetweets(Post post, Connection connection) {
 		List<Post> retweets = new ArrayList<Post>();
@@ -199,11 +174,6 @@ public class PostDAOImpl implements PostDAO {
 		}
 		return retweets;
 	}
-
-	// public Set<Post> getReplies(Post post) {
-	// Connection connection = pool.getConnection();
-	// return this.getReplies(post, connection);
-	// }
 
 	@Override
 	public List<Post> getReplies(Post post, Connection connection) {
@@ -235,12 +205,6 @@ public class PostDAOImpl implements PostDAO {
 		}
 		return answers;
 	}
-
-	// @Override
-	// public List<Post> getUserPosts(User user) {
-	// Connection conn = pool.getConnection();
-	// return this.getUserPosts(user, conn);
-	// }
 
 	@Override
 	public List<Post> getUserPosts(User user, Connection connection) {
@@ -336,12 +300,6 @@ public class PostDAOImpl implements PostDAO {
 		}
 	}
 
-	// @Override
-	// public Set<Post> getNewsfeed(User user) {
-	// Connection connection = pool.getConnection();
-	// return this.getNewsfeed(user, connection);
-	// }
-
 	public List<Post> getNewsfeed(User user, Connection connection) {
 		List<Post> newsFeed = new ArrayList<Post>();
 
@@ -364,12 +322,6 @@ public class PostDAOImpl implements PostDAO {
 		}
 		return newsFeed;
 	}
-
-	// @Override
-	// public TreeSet<User> getLikes(Post post) {
-	// Connection connection = pool.getConnection();
-	// return this.getLikes(post, connection);
-	// }
 
 	public TreeSet<User> getLikes(Post post, Connection connection) {
 
@@ -398,11 +350,6 @@ public class PostDAOImpl implements PostDAO {
 		}
 		return likes;
 	}
-
-	// public void deletePost(Post post) {
-	// Connection connection = pool.getConnection();
-	// this.deletePost(post, connection);
-	// }
 
 	@Override
 	public void deletePost(Post post, Connection connection) {

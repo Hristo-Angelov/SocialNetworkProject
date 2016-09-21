@@ -20,108 +20,131 @@ import socialnetwork.main.User;
  */
 @WebServlet("/home")
 public class UserController extends HttpServlet {
+	private static final String UNFOLLOW = "unfollow";
+	private static final String FOLLOW = "follow";
+	private static final String LOGOUT = "logout";
+	private static final String LOGIN = "login";
+	private static final String REGISTER = "register";
+	private static final String HOME = "home";
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
+
 		request.setCharacterEncoding("UTF-8");
 		String url = "/reglog.jsp";
-		
+
 		HttpSession session = request.getSession();
 
 		// get current action
 		String action = request.getParameter("action");
 		if (action == null) {
-			action = "home"; // default action
+			action = HOME; // default action
 		}
-		
+
 		// perform action and set URL to appropriate page
-		if (action.equals("home")) {
-			url = "/reglog.jsp"; // the "join" page
-		} else {
-			if (action.equals("register")) {
-				// get parameters from the request
-				String username = request.getParameter("username");
-				String password = request.getParameter("password");
-				String email = request.getParameter("email");
+		switch (action) {
+		case HOME:
+			url = "/reglog.jsp";
+			break;
 
-				// store data in User object
-				User user = new User(username, password, email);
-				String usernameMessage = RegistrationValidation.validateUsername(username);
-				String emailMessage = RegistrationValidation.validateEmail(email);
-				String passwordMessage = RegistrationValidation.validatePassword(password);
-
-				if (usernameMessage == null && emailMessage == null && passwordMessage == null) {
-					url = "/newsfeed.jsp";
-					UserDAO userDao = UserDAOImpl.getInstance();
-					ConnectionPool pool = ConnectionPool.getInstance();
-					Connection connection = pool.getConnection();
-					userDao.insertUser(user, connection);
-					pool.freeConnection(connection);
-					user = setUserToSession(session, user);
-				} else {
-					url = "/registration.jsp";
-					request.setAttribute("usernameMessage", usernameMessage);
-					request.setAttribute("emailMessage", emailMessage);
-					request.setAttribute("passwordMessage", passwordMessage);
-					request.setAttribute("user", user);					
-				}
-			} else {
-				if (action.equals("login")) {
-					// get parameters from the request
-					String username = request.getParameter("username");
-					String password = request.getParameter("password");
-
-					// store data in User object
-					User user = new User();
-					user.setUsername(username);
-					user.setPassword(password);
-					String message = UserAuthentication.validateUser(user);
-
-					if (message == null) {
-						url = "/newsfeed.jsp";
-						user = setUserToSession(session, user);
-					} else {
-						url = "/login.jsp";
-						request.setAttribute("message", message);
-						request.setAttribute("user", user);
-					}
-				} else {
-					if (action.equals("logout")) {
-						url = "/reglog.jsp";
-						session.removeAttribute("user");
-					} else {
-						if (action.equals("follow")) {
-							User subject = (User)session.getAttribute("subject");
-							User follower = (User)session.getAttribute("user");
-							session.removeAttribute("subject");
-							
-							ConnectionPool pool = ConnectionPool.getInstance();
-							Connection connection = pool.getConnection();
-							UserDAOImpl.getInstance().followUser(subject, follower, connection);
-							pool.freeConnection(connection);
-							url = "/profile.jsp?username=" + subject.getUsername();
-						} else {
-							if (action.equals("unfollow")) {
-								User subject = (User)session.getAttribute("subject");
-								User follower = (User)session.getAttribute("user");
-								session.removeAttribute("subject");
-								
-								ConnectionPool pool = ConnectionPool.getInstance();
-								Connection connection = pool.getConnection();
-								UserDAOImpl.getInstance().unfollowUser(subject, follower, connection);
-								pool.freeConnection(connection);
-								url = "/profile.jsp?username=" + subject.getUsername();
-							}
-						}
-					}
-				}
-			}
+		case REGISTER:
+			url = registerUser(request, session);
+			break;
+		case LOGIN:
+			url = loginUser(request, session);
+			break;
+		case LOGOUT:
+			url = "/reglog.jsp";
+			session.invalidate();
+			break;
+		case FOLLOW:
+			url = followUser(session);
+			break;
+		case UNFOLLOW:
+			url = unfollowUser(session);
+			break;
 		}
 
 		getServletContext().getRequestDispatcher(url).forward(request, response);
+	}
+
+	private String unfollowUser(HttpSession session) {
+		String url;
+		User subject = (User) session.getAttribute("subject");
+		User follower = (User) session.getAttribute("user");
+		session.removeAttribute("subject");
+
+		ConnectionPool pool = ConnectionPool.getInstance();
+		Connection connection = pool.getConnection();
+		UserDAOImpl.getInstance().unfollowUser(subject, follower, connection);
+		pool.freeConnection(connection);
+		url = "/profile.jsp?username=" + subject.getUsername();
+		return url;
+	}
+
+	private String followUser(HttpSession session) {
+		String url;
+		User subject = (User) session.getAttribute("subject");
+		User follower = (User) session.getAttribute("user");
+		session.removeAttribute("subject");
+
+		ConnectionPool pool = ConnectionPool.getInstance();
+		Connection connection = pool.getConnection();
+		UserDAOImpl.getInstance().followUser(subject, follower, connection);
+		pool.freeConnection(connection);
+		url = "/profile.jsp?username=" + subject.getUsername();
+		return url;
+	}
+
+	private String loginUser(HttpServletRequest request, HttpSession session) {
+		String url;
+		String username = request.getParameter("username");
+		String password = request.getParameter("password");
+
+		User user = new User();
+		user.setUsername(username);
+		user.setPassword(password);
+		String message = UserAuthentication.validateUser(user);
+
+		if (message == null) {
+			url = "/newsfeed.jsp";
+			user = setUserToSession(session, user);
+		} else {
+			url = "/login.jsp";
+			request.setAttribute("message", message);
+			request.setAttribute("user", user);
+		}
+		return url;
+	}
+
+	private String registerUser(HttpServletRequest request, HttpSession session) {
+		String url;
+		String username = request.getParameter("username");
+		String password = request.getParameter("password");
+		String email = request.getParameter("email");
+
+		User user = new User(username, password, email);
+		String usernameMessage = RegistrationValidation.validateUsername(username);
+		String emailMessage = RegistrationValidation.validateEmail(email);
+		String passwordMessage = RegistrationValidation.validatePassword(password);
+		if (usernameMessage == null && emailMessage == null && passwordMessage == null) {
+			url = "/newsfeed.jsp";
+			UserDAO userDao = UserDAOImpl.getInstance();
+			ConnectionPool pool = ConnectionPool.getInstance();
+			Connection connection = pool.getConnection();
+			userDao.insertUser(user, connection);
+			pool.freeConnection(connection);
+			user = setUserToSession(session, user);
+		} else {
+			url = "/registration.jsp";
+			request.setAttribute("usernameMessage", usernameMessage);
+			request.setAttribute("emailMessage", emailMessage);
+			request.setAttribute("passwordMessage", passwordMessage);
+			request.setAttribute("user", user);
+		}
+		return url;
 	}
 
 	private User setUserToSession(HttpSession session, User user) {

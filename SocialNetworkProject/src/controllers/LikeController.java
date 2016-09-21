@@ -20,6 +20,9 @@ import socialnetwork.main.User;
  */
 @WebServlet("/likes")
 public class LikeController extends HttpServlet {
+	private static final String UNLIKE = "unlike";
+	private static final String LIKE = "like";
+	private static final String LOGIN = "login";
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -43,40 +46,36 @@ public class LikeController extends HttpServlet {
 		HttpSession session = request.getSession();
 
 		// get current action
-		String action = (String)session.getAttribute("likeAction");
-		int postId = (int)session.getAttribute("postId");
+		String action = request.getParameter("action");
+		int postId = Integer.parseInt(request.getParameter("postId"));
 		if (action == null) {
 			action = "default";
 		}
 		if (session.getAttribute("user") == null) {
-			action = "login";
+			action = LOGIN;
 		}
 		// perform action and set URL to appropriate page
-		if (action.equals("login")) {
-			url = "/login.jsp"; // the "join" page
+		switch (action) {
+		case LOGIN:
+			url = "/login.jsp";
 			request.setAttribute("message", "You are not logged in.");
-		} else {
-			if (action.equals("like")) {
-				postId = (int)session.getAttribute("postId");
-				url = "/post.jsp?postId=" + postId;
-				this.like(session, postId);
-				session.removeAttribute("originalPost");
-			} else {
-				if (action.equals("unlike")) {
-					postId = (int)session.getAttribute("postId");
-					url = "/post.jsp?postId=" + postId;
-					this.unlike(session, postId);
-					session.removeAttribute("originalPost");
-				}
-			}
+			break;
+		case LIKE:
+			url = "/newsfeed.jsp";
+			this.like(session, postId);
+			session.removeAttribute("originalPost");
+			break;
+		case UNLIKE:
+			url = "/newsfeed.jsp";
+			this.unlike(session, postId);
+			session.removeAttribute("originalPost");
+			break;
 		}
-		session.removeAttribute("likeAction");
-		session.removeAttribute("postId");
 		getServletContext().getRequestDispatcher(url).forward(request, response);
 	}
 
 	private void unlike(HttpSession session, int postId) {
-		User user = (User)session.getAttribute("user");
+		User user = (User) session.getAttribute("user");
 		ConnectionPool pool = ConnectionPool.getInstance();
 		Connection connection = pool.getConnection();
 		PostDAOImpl.getInstance().removeLike(postId, user, connection);
@@ -84,7 +83,7 @@ public class LikeController extends HttpServlet {
 	}
 
 	private void like(HttpSession session, int postId) {
-		User user = (User)session.getAttribute("user");
+		User user = (User) session.getAttribute("user");
 		ConnectionPool pool = ConnectionPool.getInstance();
 		Connection connection = pool.getConnection();
 		PostDAOImpl.getInstance().addLike(postId, user, connection);

@@ -22,6 +22,10 @@ import socialnetwork.main.User;
  */
 @WebServlet("/welcome")
 public class PostController extends HttpServlet {
+	private static final String REPLY = "reply";
+	private static final String RETWEET = "retweet";
+	private static final String TWEET = "tweet";
+	private static final String LOGIN = "login";
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -50,32 +54,33 @@ public class PostController extends HttpServlet {
 			action = "default";
 		}
 		if (session.getAttribute("user") == null) {
-			action = "login";
+			action = LOGIN;
 		}
 
+		Post originalPost = null;
 		// perform action and set URL to appropriate page
-		if (action.equals("login")) {
-			url = "/login.jsp"; // the "join" page
+		switch (action) {
+		case LOGIN:
+			url = "/login.jsp";
 			request.setAttribute("message", "You are not logged in.");
-		} else {
-			if (action.equals("tweet")) {
-				url = "/newsfeed.jsp";
-				this.addTweet(request, session, PostType.REGULAR);
-			} else {
-				Post originalPost = (Post)session.getAttribute("originalPost");
-				if (action.equals("retweet")) {
-					url = "/post.jsp?postId=" + originalPost.getPostId();
-					this.addTweet(request, session, PostType.RETWEET, originalPost);
-				} else {
-					if (action.equals("reply")) {
-						url = "/post.jsp?postId=" + originalPost.getPostId();
-						this.addTweet(request, session, PostType.ANSWER, originalPost);
-					} 
-				}
-				session.removeAttribute("originalPost");
-			}
+			break;
+		case TWEET:
+			url = "/newsfeed.jsp";
+			this.addTweet(request, session, PostType.REGULAR);
+			break;
+		case RETWEET:
+			originalPost = (Post) session.getAttribute("originalPost");
+			url = "/post.jsp?postId=" + originalPost.getPostId();
+			this.addTweet(request, session, PostType.RETWEET, originalPost);
+			break;
+		case REPLY:
+			originalPost = (Post) session.getAttribute("originalPost");
+			url = "/post.jsp?postId=" + originalPost.getPostId();
+			this.addTweet(request, session, PostType.ANSWER, originalPost);
+			break;
 		}
-
+		
+		session.removeAttribute("originalPost");
 		getServletContext().getRequestDispatcher(url).forward(request, response);
 
 	}
@@ -86,7 +91,7 @@ public class PostController extends HttpServlet {
 
 	private void addTweet(HttpServletRequest request, HttpSession session, PostType postType, Post originalPost) {
 		// get parameters from the request
-		String text = request.getParameter("tweet");
+		String text = request.getParameter(TWEET);
 		User user = (User) session.getAttribute("user");
 		Post post = new Post();
 		post.setText(text);
