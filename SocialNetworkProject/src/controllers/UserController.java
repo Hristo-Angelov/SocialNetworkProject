@@ -2,6 +2,9 @@ package controllers;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import database.ConnectionPool;
+import database.DBUtil;
 import database.UserDAO;
 import database.UserDAOImpl;
 import socialnetwork.main.User;
@@ -60,41 +64,42 @@ public class UserController extends HttpServlet {
 			session.invalidate();
 			break;
 		case FOLLOW:
-			url = followUser(session);
+			url = followUser(request, session);
 			break;
 		case UNFOLLOW:
-			url = unfollowUser(session);
+			url = unfollowUser(request, session);
 			break;
 		}
 
 		getServletContext().getRequestDispatcher(url).forward(request, response);
 	}
 
-	private String unfollowUser(HttpSession session) {
-		String url;
-		User subject = (User) session.getAttribute("subject");
+	private String unfollowUser(HttpServletRequest request, HttpSession session) {
 		User follower = (User) session.getAttribute("user");
-		session.removeAttribute("subject");
 
 		ConnectionPool pool = ConnectionPool.getInstance();
 		Connection connection = pool.getConnection();
+		String subjectName = request.getParameter("subjectName");
+		User subject = UserDAOImpl.getInstance().selectUser(subjectName, connection);
+
 		UserDAOImpl.getInstance().unfollowUser(subject, follower, connection);
 		pool.freeConnection(connection);
-		url = "/profile.jsp?username=" + subject.getUsername();
+		String url = "/profile.jsp?username=" + subject.getUsername();
 		return url;
 	}
 
-	private String followUser(HttpSession session) {
-		String url;
-		User subject = (User) session.getAttribute("subject");
+	private String followUser(HttpServletRequest request, HttpSession session) {
 		User follower = (User) session.getAttribute("user");
-		session.removeAttribute("subject");
 
 		ConnectionPool pool = ConnectionPool.getInstance();
+
 		Connection connection = pool.getConnection();
+		String subjectName = request.getParameter("subjectName");
+		User subject = UserDAOImpl.getInstance().selectUser(subjectName, connection);
+
 		UserDAOImpl.getInstance().followUser(subject, follower, connection);
 		pool.freeConnection(connection);
-		url = "/profile.jsp?username=" + subject.getUsername();
+		String url = "/profile.jsp?username=" + subject.getUsername();
 		return url;
 	}
 
